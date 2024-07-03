@@ -21,15 +21,15 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-      interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /help.`,
+      await interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
     }
     if (config.botCommandsChannel) {
       const channel = client.channels.cache.get(config.botCommandsChannel);
       if (channel !== interaction.channel) {
-        interaction.reply({
+        await interaction.reply({
           content: `You cannot use commands in this channel`,
           ephemeral: true,
         });
@@ -59,7 +59,7 @@ module.exports = {
       team !== "om" &&
       team !== "tm"
     ) {
-      interaction.editReply({
+    await interaction.editReply({
         content: `${team} is not a valid team. Valid options are: One More, OM, om, Two More, TM, tm.`,
       });
       return;
@@ -73,7 +73,7 @@ module.exports = {
       } else if (
         !member.roles.cache.some((role) => role.name === "OM Manager")
       ) {
-        interaction.editReply({
+      await interaction.editReply({
           content: `You are not authorised to recruit people for One More.`,
         });
         return;
@@ -92,7 +92,7 @@ module.exports = {
       team = "One More";
     } else if (team === "TM" || team === "Two More" || team === "tm") {
       if (!user.roles.cache.some((role) => role.name === "TM Roster")) {
-        interaction.editReply({
+      await interaction.editReply({
           content: `This player is not in Two More.`,
           ephemeral: true,
         });
@@ -100,7 +100,7 @@ module.exports = {
       } else if (
         !member.roles.cache.some((role) => role.name === "TM Manager")
       ) {
-        interaction.editReply({
+      await interaction.editReply({
           content: `You are not authorised to recruit people for Two More.`,
         });
         return;

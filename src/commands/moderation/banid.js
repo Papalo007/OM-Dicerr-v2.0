@@ -96,7 +96,7 @@ module.exports = {
       }
     } else {
       validPurgeTime = false;
-      interaction.editReply(
+    await interaction.editReply(
         "Invalid purge option format: The selection must end in s (seconds), m (minutes), h (hours) or d (days)"
       );
     }
@@ -188,7 +188,7 @@ module.exports = {
       console.log("An error occurred. User's DMs are probably off.");
     } finally {
       await guild.members.ban(userId).catch(console.error);
-      interaction.editReply({
+    await interaction.editReply({
         content: `**<@${userId}>** has been banned succesfully. Reason: ${reason}`,
       });
       logChannel.send({

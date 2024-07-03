@@ -9,15 +9,15 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-      interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /help.`,
+    await interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
     }
     if (config.botCommandsChannel) {
       const channel = client.channels.cache.get(config.botCommandsChannel);
       if (channel !== interaction.channel) {
-        interaction.reply({
+      await interaction.reply({
           content: `You cannot use commands in this channel`,
           ephemeral: true,
         });

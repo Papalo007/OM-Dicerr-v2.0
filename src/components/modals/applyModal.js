@@ -7,20 +7,28 @@ module.exports = {
     name: `application-modal`,
   },
   async execute(interaction, client) {
+    const config = await Config.findOne({ guildID: interaction.guild.id });
+    if (!config) {
+    await interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /config.`,
+      });
+      return;
+    }
+
     const tracker = interaction.fields.getTextInputValue("tracker");
     const valoRoles = interaction.fields.getTextInputValue("roles");
     const agents = interaction.fields.getTextInputValue("agents");
     const warmup = interaction.fields.getTextInputValue("warmup") ?? "N/A";
     const notes = interaction.fields.getTextInputValue("notes") ?? "N/A";
     const appRole = interaction.guild.roles.cache.get("1257734734168068147");
-    const logChannel = client.channels.cache.get(Config.logChannelID);
-    const user = interaction.user;
-    console.log(interaction.user);
-    console.log(user);
+    const logChannel = client.channels.cache.get(config.logChannelID);
+    const member = interaction.member;
+
+    await interaction.deferReply({ ephemeral: true });
 
     //validation checks
     if (!tracker.startsWith("https://tracker.gg/valorant/profile/riot/")) {
-      await interaction.reply({
+      await interaction.editReply({
         content: `${tracker} is not a valid tracker link. Tracker links start with "https://tracker.gg/valorant/profile/riot/"`,
         ephemeral: true,
       });
@@ -28,13 +36,13 @@ module.exports = {
     }
     if (
       !valoRoles.toLowerCase().includes("duelist") &&
-      !valoRoles.toLowerCase().includes("controller") &&
-      !valoRoles.toLowerCase().includes("initiator") &&
-      !valoRoles.toLowerCase().includes("sentinel") &&
+      !valoRoles.toLowerCase().includes("control") &&
+      !valoRoles.toLowerCase().includes("ini") &&
+      !valoRoles.toLowerCase().includes("sen") &&
       !valoRoles.toLowerCase().includes("all") &&
       !valoRoles.toLowerCase().includes("every")
     ) {
-      interaction.reply({
+      await interaction.editReply({
         content: `${valoRoles} is/are not a valid selection of Valorant roles`,
       });
       return;
@@ -42,7 +50,7 @@ module.exports = {
     //end of validation checks
     const errorCheck = await App.findOne({ userID: interaction.user.id });
     if (errorCheck) {
-      interaction.reply({
+      await interaction.editReply({
         content: `It seems that there already exists an application with your user ID. If you get this error, please DM @papalo007`,
       });
       return;
@@ -58,9 +66,13 @@ module.exports = {
       notes: notes,
     });
     await application.save().catch(console.error);
-    
-    await user.roles.add(appRole).catch(console.error);
-    logChannel.send({content: `Application submitted by ${interaction.user.name} (<@${interaction.user.id})`});
-    interaction.reply({content: `Your application has been submitted!`})
+
+    member.roles.add(appRole).catch(console.error);
+    logChannel.send({
+      content: `Application submitted by ${interaction.user.name} (<@${interaction.user.id})`,
+    });
+    await interaction.editReply({
+      content: `Your application has been submitted!`,
+    });
   },
 };
