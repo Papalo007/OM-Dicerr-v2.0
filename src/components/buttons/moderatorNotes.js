@@ -1,8 +1,11 @@
+const {
+  TextInputBuilder,
+  ActionRowBuilder,
+  ModalBuilder,
+  TextInputStyle,
+} = require("discord.js");
 const Temp = require("../../schemas/temp");
 const Config = require("../../schemas/config");
-const App = require("../../schemas/application");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const { databaseToken } = process.env;
 
 module.exports = {
   data: {
@@ -17,11 +20,9 @@ module.exports = {
       });
       return;
     }
-    const config = await Config.findOne({ guildID: interaction.guild.id });
-    const logChannel = client.channels.cache.get(config.logChannelID);
     const user = tempDoc.tempValueTwo;
     const interactionUser = tempDoc.tempValueThree;
-    const app = await App.findOne({ userID: user });
+    const actualUser = await client.users.fetch(user);
 
     if (interaction.user.id !== interactionUser) {
       interaction.reply({
@@ -33,29 +34,19 @@ module.exports = {
 
     await interaction.deferReply({ ephemeral: true });
 
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const modal = new ModalBuilder()
+      .setCustomId(`mod-notes-modal`)
+      .setTitle(`Add notes to ${actualUser}'s application.`);
 
-    const myDB = mongoClient.db("test");
-    const appColl = myDB.collection("applications");
-    const filter = { userID: user };
+    const modNoteInput = new TextInputBuilder()
+      .setCustomId(`modNotes`)
+      .setLabel(`Only moderators can see this.`)
+      .setRequired(true)
+      .setStyle(TextInputStyle.Paragraph);
 
-    const updateDocument = {
-      $set: {
-        missedMatches: missedMatches,
-      },
-    };
-    await appColl.updateOne(filter, updateDocument);
-    await interaction.editReply({
-      content: `Added a missed match to <@${user}>. They are now at ${missedMatches}`,
-    });
-    logChannel.send(
-      `Added a missed match to <@${user}> by ${interaction.user.tag}, bringing their total to ${missedMatches}.`
-    );
+    const firstActionRow = new ActionRowBuilder().addComponents(modNoteInput);
+
+    modal.addComponents(firstActionRow);
+    await interaction.showModal(modal);
   },
 };

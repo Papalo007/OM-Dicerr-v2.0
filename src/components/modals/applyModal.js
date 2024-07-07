@@ -51,7 +51,7 @@ module.exports = {
     const errorCheck = await App.findOne({ userID: interaction.user.id });
     if (errorCheck) {
       await interaction.editReply({
-        content: `It seems that there already exists an application with your user ID. If you get this error, please DM @papalo007`,
+        content: `It seems that there already exists an application with your user ID. If you get this error, please open a ticket in <#1223388941718257797>`,
       });
       return;
     }

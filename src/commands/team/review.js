@@ -310,7 +310,7 @@ module.exports = {
           components: [firstActionRow, secondActionRow],
         });
       }
-      console.log("30 seconds passed.");
-    }, 30_000);
+      console.log("1 minute passed.");
+    }, 60_000);
   },
 };

@@ -17,12 +17,12 @@ module.exports = {
 
           if (interaction.fetchReply()) {
             await interaction.followUp({
-              content: `Something went wrong while executing this command. If you see this, please DM @papalo007`,
+              content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
               ephemeral: true,
             });
           } else {
             await interaction.deferReply({
-              content: `Something went wrong while executing this command. If you see this, please DM @papalo007`,
+              content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
               ephemeral: true,
             });
           }
