@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const Config = require("../../schemas/config");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const { databaseToken } = process.env;
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -37,7 +39,7 @@ module.exports = {
       }
     }
 
-    await interaction.deferReply({ content: `Working on it...`, ephemeral: true });
+    await interaction.deferReply();
 
     const targetUser = interaction.options.getUser("target");
     const user = interaction.options.getMember("target");
@@ -46,6 +48,18 @@ module.exports = {
     const member = interaction.member;
     const omRole = interaction.guild.roles.cache.get("1219879616546738236");
     const tmRole = interaction.guild.roles.cache.get("1243214533590384660");
+    const appRole = interaction.guild.roles.cache.get("1257734734168068147");
+    const mongoClient = new MongoClient(databaseToken, {
+      serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+      },
+    });
+
+    const myDB = mongoClient.db("test");
+    const appColl = myDB.collection("applications");
+    const query = { userID: userId };
 
     const announcementChannel = client.channels.cache.get(
       config.rosterChangesChannelID
@@ -85,6 +99,7 @@ module.exports = {
         return;
       } else {
         await user.roles.add(omRole).catch(console.error);
+        await user.roles.remove(appRole).catch(console.error);
 
         if (announcementChannel) {
           announcementChannel.send({
@@ -93,7 +108,7 @@ module.exports = {
         }
 
         targetUser.send({
-          content: `Congratulations, you have been accepted to One More.\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM papalo and ask for an invite to the OM server. I can't do that myself :(`,
+          content: `Congratulations, you have been accepted to One More!\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM papalo and ask for an invite to the OM server. I can't do that myself :(`,
         });
       }
       team = "One More";
@@ -118,6 +133,7 @@ module.exports = {
         return;
       } else {
         await user.roles.add(tmRole).catch(console.error);
+        await user.roles.remove(appRole).catch(console.error);
 
         if (announcementChannel) {
           announcementChannel.send({
@@ -183,6 +199,10 @@ module.exports = {
       })
       .setTimestamp();
 
+    await interaction.editReply({
+      content: `${targetUser.tag} has succesfully been recruited to ${team}!`,
+    });
     logChannel.send({ embeds: [logEmbed] });
+    await appColl.deleteOne(query).catch(console.error);
   },
 };

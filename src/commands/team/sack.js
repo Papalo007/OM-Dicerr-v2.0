@@ -37,7 +37,7 @@ module.exports = {
       }
     }
 
-    await interaction.deferReply({ content: `Working on it...`, ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     const targetUser = interaction.options.getUser("target");
     const user = interaction.options.getMember("target");
@@ -59,7 +59,7 @@ module.exports = {
       team !== "om" &&
       team !== "tm"
     ) {
-    await interaction.editReply({
+      await interaction.editReply({
         content: `${team} is not a valid team. Valid options are: One More, OM, om, Two More, TM, tm.`,
       });
       return;
@@ -73,7 +73,7 @@ module.exports = {
       } else if (
         !member.roles.cache.some((role) => role.name === "OM Manager")
       ) {
-      await interaction.editReply({
+        await interaction.editReply({
           content: `You are not authorised to recruit people for One More.`,
         });
         return;
@@ -92,7 +92,7 @@ module.exports = {
       team = "One More";
     } else if (team === "TM" || team === "Two More" || team === "tm") {
       if (!user.roles.cache.some((role) => role.name === "TM Roster")) {
-      await interaction.editReply({
+        await interaction.editReply({
           content: `This player is not in Two More.`,
           ephemeral: true,
         });
@@ -100,7 +100,7 @@ module.exports = {
       } else if (
         !member.roles.cache.some((role) => role.name === "TM Manager")
       ) {
-      await interaction.editReply({
+        await interaction.editReply({
           content: `You are not authorised to recruit people for Two More.`,
         });
         return;
@@ -170,6 +170,9 @@ module.exports = {
       })
       .setTimestamp();
 
+    await interaction.editReply({
+      content: `${targetUser.tag} has been succesfully kicked from ${team}.`,
+    });
     logChannel.send({ embeds: [logEmbed] });
   },
 };

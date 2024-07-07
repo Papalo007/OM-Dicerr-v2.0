@@ -7,6 +7,8 @@ const applicationSchema = new Schema({
   agents: String,
   warmup: { type: String, required: false },
   notes: { type: String, required: false },
+  missedMatches: { type: Number, required: false },
+  moderatorNotes: { type: String, required: false },
 });
 
 module.exports = model("App", applicationSchema, "applications");

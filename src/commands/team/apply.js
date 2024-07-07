@@ -30,7 +30,6 @@ module.exports = {
         return;
       }
     }
-    //await interaction.reply('Working on it...'); <-- doesn't work
 
     if (
       interaction.member.roles.cache.some((role) => role.name === "Applicant")
@@ -104,7 +103,7 @@ module.exports = {
       fourthActionRow,
       fifthActionRow
     );
-    
+
     //showing the modal
     await interaction.showModal(modal);
   },

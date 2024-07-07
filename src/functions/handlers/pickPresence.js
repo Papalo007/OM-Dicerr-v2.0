@@ -15,7 +15,7 @@ module.exports = (client) => {
       },
       {
         type: ActivityType.Competing,
-        text: "in Premier",
+        text: "Premier",
         status: "dnd",
       },
     ];

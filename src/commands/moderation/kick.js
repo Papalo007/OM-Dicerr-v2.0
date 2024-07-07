@@ -41,6 +41,8 @@ module.exports = {
       }
     }
 
+    interaction.deferReply();
+
     const user = interaction.options.getUser("target");
     let dmuser = "false";
     let reason = interaction.options.getString("reason");
@@ -48,7 +50,6 @@ module.exports = {
       .fetch(user.id)
       .catch(console.error);
 
-  await interaction.reply({ content: `Working on it...` });
 
     if (!reason) reason = "N/A.";
     const logChannel = client.channels.cache.get(config.logChannelID);

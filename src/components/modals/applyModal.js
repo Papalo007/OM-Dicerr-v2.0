@@ -9,7 +9,7 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-    await interaction.reply({
+      await interaction.reply({
         content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
@@ -64,15 +64,16 @@ module.exports = {
       agents: agents,
       warmup: warmup,
       notes: notes,
+      missedMatches: 0,
     });
     await application.save().catch(console.error);
 
     member.roles.add(appRole).catch(console.error);
     logChannel.send({
-      content: `Application submitted by ${interaction.user.name} (<@${interaction.user.id})`,
+      content: `Application submitted by ${interaction.user.username} (<@${interaction.user.id}>)`,
     });
     await interaction.editReply({
-      content: `Your application has been submitted!`,
+      content: `Your application has been submitted! To review or withdraw your application, run /review followed by your name.`,
     });
   },
 };

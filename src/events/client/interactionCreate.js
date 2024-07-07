@@ -9,22 +9,26 @@ module.exports = {
       const command = commands.get(commandName);
       if (!command) return;
 
-      try {
-        await command.execute(interaction, client);
-      } catch (error) {
-        console.error(error);
+      if (interaction.isRepliable()) {
+        try {
+          await command.execute(interaction, client);
+        } catch (error) {
+          console.error(error);
 
-        if (interaction.fetchReply()) {
-          await interaction.editReply({
-            content: `Something went wrong while executing this command. If you see this, please DM @papalo007`,
-            ephemeral: true,
-          });
-        } else {
-          await interaction.reply({
-            content: `Something went wrong while executing this command. If you see this, please DM @papalo007`,
-            ephemeral: true,
-          });
+          if (interaction.fetchReply()) {
+            await interaction.followUp({
+              content: `Something went wrong while executing this command. If you see this, please DM @papalo007`,
+              ephemeral: true,
+            });
+          } else {
+            await interaction.deferReply({
+              content: `Something went wrong while executing this command. If you see this, please DM @papalo007`,
+              ephemeral: true,
+            });
+          }
         }
+      } else {
+        await command.execute(interaction, client);
       }
     } else if (interaction.isButton()) {
       const { buttons } = client;
