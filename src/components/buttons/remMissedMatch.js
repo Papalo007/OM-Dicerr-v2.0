@@ -1,7 +1,7 @@
 const Temp = require("../../schemas/temp");
 const Config = require("../../schemas/config");
 const App = require("../../schemas/application");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
 
 module.exports = {
@@ -41,13 +41,7 @@ module.exports = {
 
     await interaction.deferReply({ ephemeral: true });
 
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const mongoClient = new MongoClient(databaseToken);
 
     const myDB = mongoClient.db("test");
     const appColl = myDB.collection("applications");
@@ -62,7 +56,7 @@ module.exports = {
     await interaction.editReply({
       content: `Removed a missed match from <@${user}>. They are now at ${missedMatches}`,
     });
-    logChannel.send(
+    await logChannel.send(
       `Removed a missed match from <@${user}> by ${interaction.user.tag}, bringing their total to ${missedMatches}.`
     );
   },

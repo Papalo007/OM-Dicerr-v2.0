@@ -1,17 +1,11 @@
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
 
 module.exports = {
   name: "ready",
   once: true,
   async execute(client) {
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const mongoClient = new MongoClient(databaseToken);
     const myDB = mongoClient.db("test");
     await myDB.collection("temp").deleteMany({});
     console.log('Cleared database collection "temp"');

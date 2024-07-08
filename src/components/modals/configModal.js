@@ -1,6 +1,6 @@
 const { PermissionFlagsBits } = require("discord.js");
 const Config = require("../../schemas/config");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const mongoose = require('mongoose');
 const { databaseToken } = process.env;
 
@@ -9,13 +9,7 @@ module.exports = {
     name: `config-modal`,
   },
   async execute(interaction, client) {
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const mongoClient = new MongoClient(databaseToken);
 
     let logChannelID = interaction.fields.getTextInputValue("logChan");
     let botCommandChannelID = interaction.fields.getTextInputValue("comChan");

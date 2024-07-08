@@ -42,10 +42,7 @@ module.exports = {
     let dmuser = "true";
     let validPurgeTime = true;
 
-    await interaction.reply({
-      content: "Working on it...",
-      ephemeral: true,
-    });
+    await interaction.deferReply({ ephemeral: true });
 
     if (!guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
       return interaction.editReply({
@@ -96,7 +93,7 @@ module.exports = {
       }
     } else {
       validPurgeTime = false;
-    await interaction.editReply(
+      await interaction.editReply(
         "Invalid purge option format: The selection must end in s (seconds), m (minutes), h (hours) or d (days)"
       );
     }
@@ -113,7 +110,7 @@ module.exports = {
     if (!validPurgeTime) return;
     //embed
 
-    logEmbed = new EmbedBuilder()
+    const logEmbed = new EmbedBuilder()
       .setAuthor({
         name: "Moderator Dicer",
         iconURL: interaction.user.displayAvatarURL(),
@@ -171,12 +168,12 @@ module.exports = {
       });
     }
 
-
     try {
       await guild.bans.fetch(userId);
-      return interaction.editReply({content: `<@${userId}> is already banned`});
-    } catch (error) {
-    }
+      return interaction.editReply({
+        content: `<@${userId}> is already banned`,
+      });
+    } catch (error) {}
 
     try {
       await client.users.send(
@@ -188,10 +185,10 @@ module.exports = {
       console.log("An error occurred. User's DMs are probably off.");
     } finally {
       await guild.members.ban(userId).catch(console.error);
-    await interaction.editReply({
+      await interaction.editReply({
         content: `**<@${userId}>** has been banned succesfully. Reason: ${reason}`,
       });
-      logChannel.send({
+      await logChannel.send({
         embeds: [logEmbed],
       });
     }

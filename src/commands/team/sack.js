@@ -74,19 +74,19 @@ module.exports = {
         !member.roles.cache.some((role) => role.name === "OM Manager")
       ) {
         await interaction.editReply({
-          content: `You are not authorised to recruit people for One More.`,
+          content: `You are not authorised to kick people for One More.`,
         });
         return;
       }
       await user.roles.remove(omRole).catch(console.error);
 
       if (announcementChannel) {
-        announcementChannel.send({
+        await announcementChannel.send({
           content: `<@&1245743215898919143> <@${userId}> has been removed from One More's roster.`,
         });
       }
 
-      targetUser.send({
+      await targetUser.send({
         content: `Unfortunately, you have been kicked from One More, however, you can still apply for a position in Two More. To do that, complete onboarding and notify a TM Manager, that you are looking to join the team.`,
       });
       team = "One More";
@@ -101,19 +101,19 @@ module.exports = {
         !member.roles.cache.some((role) => role.name === "TM Manager")
       ) {
         await interaction.editReply({
-          content: `You are not authorised to recruit people for Two More.`,
+          content: `You are not authorised to kick people for Two More.`,
         });
         return;
       }
       await user.roles.remove(tmRole).catch(console.error);
 
       if (announcementChannel) {
-        announcementChannel.send({
+        await announcementChannel.send({
           content: `<@&1245743215898919143> <@${userId}> has been removed from Two More's roster.`,
         });
       }
 
-      targetUser.send({
+      await targetUser.send({
         content: `You have been kicked from Two More.`,
       });
       team = "Two More";
@@ -173,6 +173,6 @@ module.exports = {
     await interaction.editReply({
       content: `${targetUser.tag} has been succesfully kicked from ${team}.`,
     });
-    logChannel.send({ embeds: [logEmbed] });
+    await logChannel.send({ embeds: [logEmbed] });
   },
 };

@@ -6,7 +6,7 @@ const {
   PermissionFlagsBits,
 } = require("discord.js");
 const Config = require("../../schemas/config");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
 
 module.exports = {
@@ -52,13 +52,7 @@ module.exports = {
       cancelButton
     );
 
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const mongoClient = new MongoClient(databaseToken);
 
     const myDB = mongoClient.db("test");
     const appColl = myDB.collection("applications");
@@ -83,7 +77,7 @@ module.exports = {
           components: [],
         });
         const result = await appColl.deleteMany().catch(console.error);
-        logChannel.send(
+        await logChannel.send(
           `All (${result.deletedCount}) applications have been deleted by ${interaction.user.tag} (application database wiped succesfully)`
         );
       } else if (confirmation.customId === "cancel") {

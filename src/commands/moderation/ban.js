@@ -33,7 +33,7 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-    await interaction.reply({
+      await interaction.reply({
         content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
@@ -41,7 +41,7 @@ module.exports = {
     if (config.botCommandsChannel) {
       const channel = client.channels.cache.get(config.botCommandsChannel);
       if (channel !== interaction.channel) {
-      await interaction.reply({
+        await interaction.reply({
           content: `You cannot use commands in this channel`,
           ephemeral: true,
         });
@@ -56,10 +56,10 @@ module.exports = {
     let purgeTime = interaction.options.getString("purgetime") ?? "0s";
     let dmuser = "true";
 
-    await interaction.reply({ content: `Working on it...`, ephemeral: true });
+    await interaction.deferReply({ ephemeral: true });
 
     if (!guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
-    await interaction.editReply({
+      await interaction.editReply({
         content: `Invalid Permissions. I need to have the Ban Members permission in order to ban members :(`,
       });
       return;
@@ -71,7 +71,7 @@ module.exports = {
       purgeTime = purgeTime.slice(0, -1);
       if (containsOnlyDigits(purgeTime)) {
       } else {
-      await interaction.editReply(
+        await interaction.editReply(
           `Invalid purge option format: Can only have 1 letter (at the end of the selection)`
         );
         return;
@@ -81,7 +81,7 @@ module.exports = {
       if (containsOnlyDigits(purgeTime)) {
         purgeTime *= 60;
       } else {
-      await interaction.editReply(
+        await interaction.editReply(
           `Invalid purge option format: Can only have 1 letter (at the end of the selection)`
         );
         return;
@@ -91,7 +91,7 @@ module.exports = {
       if (containsOnlyDigits(purgeTime)) {
         purgeTime *= 60 * 60;
       } else {
-      await interaction.editReply(
+        await interaction.editReply(
           `Invalid purge option format: Can only have 1 letter (at the end of the selection)`
         );
         return;
@@ -101,13 +101,13 @@ module.exports = {
       if (containsOnlyDigits(purgeTime)) {
         purgeTime *= 24 * 60 * 60;
       } else {
-      await interaction.editReply(
+        await interaction.editReply(
           `Invalid purge option format: Can only have 1 letter (at the end of the selection)`
         );
         return;
       }
     } else {
-    await interaction.editReply(
+      await interaction.editReply(
         "Invalid purge option format: The selection must end in s (seconds), m (minutes), h (hours) or d (days)"
       );
       return;
@@ -117,7 +117,7 @@ module.exports = {
 
     if (purgeTime > 604800) {
       // 7 * 24 * 60 * 60 = 604800
-    await interaction.editReply(
+      await interaction.editReply(
         `Invalid purge option: Cannot be longer than 7 days.`
       );
       return;
@@ -139,7 +139,7 @@ module.exports = {
       } finally {
         // Ban Embed
 
-        logEmbed = new EmbedBuilder()
+        const logEmbed = new EmbedBuilder()
           .setAuthor({
             name: "Moderator Dicer",
             iconURL: interaction.user.displayAvatarURL(),
@@ -199,10 +199,10 @@ module.exports = {
             reason: reason,
           })
           .catch(console.error);
-      await interaction.editReply({
+        await interaction.editReply({
           content: `**${user}** has been banned succesfully.`,
         });
-        logChannel.send({
+        await logChannel.send({
           embeds: [logEmbed],
         });
       }

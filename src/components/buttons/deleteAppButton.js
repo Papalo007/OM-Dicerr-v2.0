@@ -1,7 +1,7 @@
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const Temp = require("../../schemas/temp");
 const Config = require("../../schemas/config");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
 
 module.exports = {
@@ -49,13 +49,7 @@ module.exports = {
 
     await interaction.deferReply({ ephemeral: true });
 
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const mongoClient = new MongoClient(databaseToken);
 
     const myDB = mongoClient.db("test");
     const appColl = myDB.collection("applications");
@@ -81,7 +75,7 @@ module.exports = {
           components: [],
         });
         member.roles.remove(appRole).catch(console.error);
-        logChannel.send(
+        await logChannel.send(
           `<@${user}>'s application has been deleted by ${interaction.user.tag}`
         );
         await appColl.deleteOne(query).catch(console.error);

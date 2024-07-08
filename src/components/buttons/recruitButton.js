@@ -6,7 +6,7 @@ const {
 } = require("discord.js");
 const Config = require("../../schemas/config");
 const Temp = require("../../schemas/temp");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
 
 module.exports = {
@@ -34,13 +34,7 @@ module.exports = {
     const member = await interaction.guild.members.fetch(user);
     const targetUser = await client.users.fetch(user);
     let team;
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
+    const mongoClient = new MongoClient(databaseToken);
 
     const myDB = mongoClient.db("test");
     const appColl = myDB.collection("applications");
@@ -103,12 +97,12 @@ module.exports = {
           await member.roles.remove(appRole).catch(console.error);
 
           if (announcementChannel) {
-            announcementChannel.send({
+            await announcementChannel.send({
               content: `<@&1245743215898919143> <@${user}> has been accepted to One More!`,
             });
           }
 
-          targetUser.send({
+          await targetUser.send({
             content: `Congratulations, you have been accepted to One More!\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM papalo and ask for an invite to the OM server. I can't do that myself :(`,
           });
 
@@ -130,12 +124,12 @@ module.exports = {
           await member.roles.remove(appRole).catch(console.error);
 
           if (announcementChannel) {
-            announcementChannel.send({
+            await announcementChannel.send({
               content: `<@&1245743215898919143> <@${user}> has been accepted to Two More!`, 
             });
           }
 
-          targetUser.send({
+          await targetUser.send({
             content: `Congratulations, you have been accepted to Two More! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
           });
 
@@ -205,7 +199,7 @@ module.exports = {
       content: `${targetUser.tag} has succesfully been recruited to ${team}!`,
       components: [],
     });
-    logChannel.send({ embeds: [logEmbed] });
+    await logChannel.send({ embeds: [logEmbed] });
     await appColl.deleteOne(query).catch(console.error);
   },
 };

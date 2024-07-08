@@ -23,9 +23,12 @@ module.exports = {
         .setDescription("The reason for kicking the member.")
     ),
   async execute(interaction, client) {
+    
+
+    await interaction.deferReply({ ephemeral: true });
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-    await interaction.reply({
+      await interaction.editReply({
         content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
@@ -33,7 +36,7 @@ module.exports = {
     if (config.botCommandsChannel) {
       const channel = client.channels.cache.get(config.botCommandsChannel);
       if (channel !== interaction.channel) {
-      await interaction.reply({
+        await interaction.editReply({
           content: `You cannot use commands in this channel`,
           ephemeral: true,
         });
@@ -41,15 +44,12 @@ module.exports = {
       }
     }
 
-    interaction.deferReply();
-
     const user = interaction.options.getUser("target");
     let dmuser = "false";
     let reason = interaction.options.getString("reason");
     const member = await interaction.guild.members
       .fetch(user.id)
       .catch(console.error);
-
 
     if (!reason) reason = "N/A.";
     const logChannel = client.channels.cache.get(config.logChannelID);
@@ -66,7 +66,7 @@ module.exports = {
 
     if (member.kickable) {
       try {
-        user.send({
+        await user.send({
           content: `You have been kicked from **${interaction.guild.name}**\nReason: ${reason}`,
         });
       } catch (error) {
@@ -76,7 +76,7 @@ module.exports = {
 
       // Log Embed
 
-      logEmbed = new EmbedBuilder()
+      const logEmbed = new EmbedBuilder()
         .setAuthor({
           name: "Moderator Dicer",
           iconURL: interaction.user.displayAvatarURL(),
@@ -124,7 +124,7 @@ module.exports = {
 
       // Embed
 
-      logChannel.send({ embeds: [logEmbed] });
+      await logChannel.send({ embeds: [logEmbed] });
       await member.kick(reason).catch(console.error);
       if (interaction.fetchReply()) {
         await interaction.editReply({

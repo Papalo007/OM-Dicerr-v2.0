@@ -9,7 +9,7 @@ const Config = require("../../schemas/config");
 const App = require("../../schemas/application");
 const Temp = require("../../schemas/temp");
 const mongoose = require("mongoose");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
 
 module.exports = {
@@ -32,6 +32,8 @@ module.exports = {
       });
       return;
     }
+
+    const mongoClient = new MongoClient(databaseToken);
 
     const user = interaction.options.getUser("target");
     const temp = await new Temp({
@@ -78,6 +80,11 @@ module.exports = {
     const moderatorNotes = app.moderatorNotes || "None.";
     const missedMatches = app.missedMatches || 0;
     let embed;
+    const warnDB = mongoClient.db("test");
+    const warnColl = warnDB.collection("warnings");
+    const query = { guildID: interaction.guild.id, userID: user.id };
+
+    const warnings = await warnColl.countDocuments(query);
 
     if (
       interaction.user === user &&
@@ -132,7 +139,7 @@ module.exports = {
           },
           {
             name: "Warnings",
-            value: "Warn system has not been created yet...",
+            value: warnings.toString(),
             inline: true,
           }
         )
@@ -183,7 +190,7 @@ module.exports = {
           },
           {
             name: "Warnings",
-            value: "Warn system has not been created yet...",
+            value: warnings.toString(),
             inline: true,
           },
           {
@@ -260,13 +267,6 @@ module.exports = {
       });
     }
 
-    const mongoClient = new MongoClient(databaseToken, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      },
-    });
     setTimeout(() => {
       const myDB = mongoClient.db("test");
       const myColl = myDB.collection("temp");

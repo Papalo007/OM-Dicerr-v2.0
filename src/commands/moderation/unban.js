@@ -26,7 +26,7 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-    await interaction.reply({
+      await interaction.reply({
         content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
@@ -34,7 +34,7 @@ module.exports = {
     if (config.botCommandsChannel) {
       const channel = client.channels.cache.get(config.botCommandsChannel);
       if (channel !== interaction.channel) {
-      await interaction.reply({
+        await interaction.reply({
           content: `You cannot use commands in this channel`,
           ephemeral: true,
         });
@@ -46,10 +46,7 @@ module.exports = {
     const { options, guild } = interaction;
     const userId = await options.getString("target");
     const reason = (await options.getString("reason")) ?? "N/A";
-    await interaction.reply({
-      content: "Working on it...",
-      ephemeral: true,
-    });
+    await interaction.deferReply({ ephemeral: true });
 
     if (!guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
       return interaction.editReply({
@@ -118,21 +115,19 @@ module.exports = {
         content: `**${user.tag}** has been unbanned.`,
       });
 
-      logChannel.send({ embeds: [embed] });
+      await logChannel.send({ embeds: [embed] });
     } catch (err) {
       if (err.name === "DiscordAPIError[10026]") {
-        logChannel.send(`Unban failed: <@${userId}> is not banned.`);
         return await interaction.editReply({
           content: `This user is not banned :/`,
         });
       }
       if (err.name === "DiscordAPIError[10013]") {
-        logChannel.send(`Unban failed: Unknown user`);
         return await interaction.editReply({
           content: `Unkown User. This probably happened because you didn't enter the correct ID.`,
         });
       } else {
-      await interaction.editReply({
+        await interaction.editReply({
           content: `An error occured while trying to unban this user.`,
         });
       }

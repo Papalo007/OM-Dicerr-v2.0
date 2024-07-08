@@ -40,7 +40,8 @@ module.exports = {
       !valoRoles.toLowerCase().includes("ini") &&
       !valoRoles.toLowerCase().includes("sen") &&
       !valoRoles.toLowerCase().includes("all") &&
-      !valoRoles.toLowerCase().includes("every")
+      !valoRoles.toLowerCase().includes("every") &&
+      !valoRoles.toLowerCase().includes("flex")
     ) {
       await interaction.editReply({
         content: `${valoRoles} is/are not a valid selection of Valorant roles`,
@@ -69,7 +70,7 @@ module.exports = {
     await application.save().catch(console.error);
 
     member.roles.add(appRole).catch(console.error);
-    logChannel.send({
+    await logChannel.send({
       content: `Application submitted by ${interaction.user.username} (<@${interaction.user.id}>)`,
     });
     await interaction.editReply({
