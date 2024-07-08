@@ -32,11 +32,9 @@ module.exports = {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
-
     const modal = new ModalBuilder()
       .setCustomId(`mod-notes-modal`)
-      .setTitle(`Add notes to ${actualUser}'s application.`);
+      .setTitle(`Add notes to ${actualUser.tag}'s application.`);
 
     const modNoteInput = new TextInputBuilder()
       .setCustomId(`modNotes`)

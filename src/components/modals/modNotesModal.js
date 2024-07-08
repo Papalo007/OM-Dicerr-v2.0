@@ -24,7 +24,7 @@ module.exports = {
     const user = tempDoc.tempValueTwo;
     let modNotes = interaction.fields.getTextInputValue("modNotes");
     const app = await App.findOne({ userID: user });
-    const existingNotes = app.moderatorNotes;
+    const existingNotes = app.moderatorNotes || ' ';
 
     let date_time = new Date();
 
@@ -41,7 +41,7 @@ module.exports = {
     const datentime =
       date + "-" + month + "-" + year + " " + hours + ":" + minutes;
 
-    modNotes = `${modNotes} - ${interaction.user.tag} on ${datentime}.`;
+    modNotes = `${modNotes} - **${interaction.user.tag} on ${datentime}**.`;
 
     await interaction.deferReply({ ephemeral: true });
 
@@ -62,7 +62,7 @@ module.exports = {
     const myDB = mongoClient.db("test");
     const appColl = myDB.collection("applications");
     const filter = { userID: user };
-    await appColl.updateOne(filter, updateDocument);
+    await appColl.updateOne(filter, updateDoc);
     await interaction.editReply({
       content: `Updated <@${user}>'s notes.`,
     });
