@@ -187,7 +187,7 @@ module.exports = {
           )
           .setColor(0xfd9323)
           .setFooter({
-            text: "Ban log by OM Dicerr v2.0",
+            text: `Ban Log by ${interaction.client.user.tag}`,
             iconURL: interaction.client.user.displayAvatarURL(),
           })
           .setTimestamp();

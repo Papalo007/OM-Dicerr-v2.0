@@ -188,7 +188,7 @@ module.exports = {
       )
       .setColor("#ff8000")
       .setFooter({
-        text: "Recruitment log by OM Dicerr v2.0",
+        text: `Recruitment log by ${interaction.client.user.username}`,
         iconURL: interaction.client.user.displayAvatarURL(),
       })
       .setTimestamp();

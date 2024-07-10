@@ -69,9 +69,9 @@ module.exports = {
         await user.send({
           content: `You have been kicked from **${interaction.guild.name}**\nReason: ${reason}`,
         });
+        dmuser = "true";
       } catch (error) {
         console.error(error);
-        dmuser = "false";
       }
 
       // Log Embed
@@ -117,7 +117,7 @@ module.exports = {
         )
         .setColor(0xfd9323)
         .setFooter({
-          text: "Kick log by OM Dicerr v2.0",
+          text: `Kick log by ${interaction.client.user.username}`,
           iconURL: interaction.client.user.displayAvatarURL(),
         })
         .setTimestamp();

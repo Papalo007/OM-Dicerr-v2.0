@@ -70,12 +70,7 @@ module.exports = {
     const cursor = warnColl.find(query, options);
     const warnCount = await warnColl.countDocuments(query);
     let warnsTogether;
-    let warnSorDot;
-    if (warnCount === 1) {
-      warnSorDot = ".";
-    } else {
-      warnSorDot = "s.";
-    }
+    const warnSorDot = warnCount === 1 ? "." : "s.";
 
     for await (const doc of cursor) {
       if (!warnsTogether) {
@@ -102,7 +97,7 @@ module.exports = {
       })
       .setColor(0xfd9323)
       .setFooter({
-        text: "Warnings called by OM Dicerr v2.0",
+        text: `Warnings called by ${interaction.client.user.username}`,
       })
       .setTimestamp();
 
@@ -113,7 +108,7 @@ module.exports = {
 
     const row = new ActionRowBuilder().addComponents(deleteWarn);
 
-    if (interaction.user === user) {
+    if (interaction.user === user || warnCount === 0) {
       await interaction.editReply({ embeds: [embed] });
     } else {
       await interaction.editReply({ embeds: [embed], components: [row] });
@@ -133,7 +128,9 @@ module.exports = {
         tempColl.deleteOne(query);
         deleteWarn.setDisabled(true);
         if (interaction.user !== user) {
-          const firstActionRow = new ActionRowBuilder().addComponents(deleteWarn);
+          const firstActionRow = new ActionRowBuilder().addComponents(
+            deleteWarn
+          );
           interaction.editReply({
             components: [firstActionRow],
           });

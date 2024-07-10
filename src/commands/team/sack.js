@@ -165,7 +165,7 @@ module.exports = {
       )
       .setColor("#ff8000")
       .setFooter({
-        text: "Roster kick log by OM Dicerr v2.0",
+        text: `Roster kick log by ${interaction.client.user.username}`,
         iconURL: interaction.client.user.displayAvatarURL(),
       })
       .setTimestamp();

@@ -1,5 +1,12 @@
+const {
+  StringSelectMenuBuilder,
+  ActionRowBuilder,
+  StringSelectMenuOptionBuilder,
+} = require("discord.js");
 const Temp = require("../../schemas/temp");
 const Config = require("../../schemas/config");
+const { databaseToken } = process.env;
+const { MongoClient } = require("mongodb");
 
 module.exports = {
   data: {
@@ -28,5 +35,31 @@ module.exports = {
     }
 
     await interaction.deferReply({ ephemeral: true });
+
+    const mongoClient = new MongoClient(databaseToken);
+    const testDB = mongoClient.db("test");
+    const warnColl = testDB.collection("warnings");
+    const query = { guildID: interaction.guild.id, userID: user.id };
+    const options = {
+      sort: { datentime: -1 },
+      projection: { _id: 0, guildID: 0, userID: 0 },
+    };
+    const cursor = warnColl.find(query, options);
+
+    const menu = new StringSelectMenuBuilder()
+      .setCustomId(`del-warn-menu`)
+      .setPlaceholder(`Select the warning you would like to delete.`)
+      .setMinValues(1)
+      .setMaxValues(1);
+
+    for await (const doc of cursor) {
+      menu.setOptions(
+        new StringSelectMenuOptionBuilder({
+          name: doc.date + " - " + doc.doc,
+          value: doc._id,
+        })
+      ).catch(console.error);
+      console.log("entered");
+    }
   },
 };
