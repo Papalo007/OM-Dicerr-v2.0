@@ -1,4 +1,4 @@
-const { ButtonBuilder, ButtonStyle } = require("discord.js");
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require("discord.js");
 const Config = require("../../schemas/config");
 const Warning = require("../../schemas/warn");
 const { MongoClient } = require("mongodb");
@@ -43,7 +43,7 @@ module.exports = {
       confirmButton,
       cancelButton
     );
-    const warnedUser = await client.users.fetch(Warning.userID);
+    const warnedUser = await client.users.fetch(warn.userID);
 
     const mongoClient = new MongoClient(databaseToken);
 
@@ -70,7 +70,7 @@ module.exports = {
           content: `Warning has been deleted`,
           components: [],
         });
-        await appColl.deleteOne(query).catch(console.error);
+        await warnColl.deleteOne(query).catch(console.error);
         await logChannel.send(
           `${interaction.user.tag} has removed a warning from ${warnedUser.tag}\nDate: ${warn.date}\nReason: ${warn.reason}`
         );

@@ -21,8 +21,6 @@ module.exports = {
       });
       return;
     }
-    const config = await Config.findOne({ guildID: interaction.guild.id });
-    const logChannel = client.channels.cache.get(config.logChannelID);
     const user = tempDoc.tempValueTwo;
     const interactionUser = tempDoc.tempValueThree;
 
@@ -39,10 +37,10 @@ module.exports = {
     const mongoClient = new MongoClient(databaseToken);
     const testDB = mongoClient.db("test");
     const warnColl = testDB.collection("warnings");
-    const query = { guildID: interaction.guild.id, userID: user.id };
+    const query = { guildID: interaction.guild.id, userID: user };
     const options = {
       sort: { datentime: -1 },
-      projection: { _id: 0, guildID: 0, userID: 0 },
+      projection: { guildID: 0, userID: 0 },
     };
     const cursor = warnColl.find(query, options);
 
@@ -53,13 +51,18 @@ module.exports = {
       .setMaxValues(1);
 
     for await (const doc of cursor) {
-      menu.setOptions(
+      menu.addOptions(
         new StringSelectMenuOptionBuilder({
-          name: doc.date + " - " + doc.doc,
+          label: `${doc.date} - ${doc.reason}`,
           value: doc._id,
         })
-      ).catch(console.error);
-      console.log("entered");
+      );
     }
+
+    const firstActionRow = new ActionRowBuilder().addComponents(menu);
+    await interaction.editReply({
+      content: `Which warning would you like to delete?`,
+      components: [firstActionRow],
+    });
   },
 };

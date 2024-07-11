@@ -108,55 +108,6 @@ module.exports = {
       );
     }
     if (!validPurgeTime) return;
-    //embed
-
-    const logEmbed = new EmbedBuilder()
-      .setAuthor({
-        name: "Moderator Dicer",
-        iconURL: interaction.user.displayAvatarURL(),
-      })
-      .setTitle("Ban Log")
-      .setDescription(`User has been banned by **${interaction.user.tag}**.`)
-      .addFields(
-        {
-          name: "  Mention",
-          value: `  <@${userId}>`,
-          inline: true,
-        },
-        {
-          name: "User ID",
-          value: userId,
-          inline: true,
-        },
-        {
-          name: "Banned by",
-          value: interaction.user.tag,
-          inline: false,
-        },
-        {
-          name: "Reason",
-          value: reason,
-          inline: false,
-        },
-        {
-          name: "Messaged User  ",
-          value: dmuser,
-          inline: true,
-        },
-        {
-          name: "  Deleted messages",
-          value: `Deleted all messages from this user in the past ${purgeTime} seconds.`,
-          inline: true,
-        }
-      )
-      .setColor(0xfd9323)
-      .setFooter({
-        text: `Ban log by ${interaction.client.user.username}`,
-        iconURL: "https://slate.dan.onl/slate.png",
-      })
-      .setTimestamp();
-
-    //embed
 
     if (!guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
       return interaction.editReply({
@@ -184,6 +135,56 @@ module.exports = {
       dmuser = "false";
       console.log("An error occurred. User's DMs are probably off.");
     } finally {
+      //embed
+
+      const logEmbed = new EmbedBuilder()
+        .setAuthor({
+          name: "Moderator Dicer",
+          iconURL: interaction.user.displayAvatarURL(),
+        })
+        .setTitle("Ban Log")
+        .setDescription(`User has been banned by **${interaction.user.tag}**.`)
+        .addFields(
+          {
+            name: "  Mention",
+            value: `  <@${userId}>`,
+            inline: true,
+          },
+          {
+            name: "User ID",
+            value: userId,
+            inline: true,
+          },
+          {
+            name: "Banned by",
+            value: interaction.user.tag,
+            inline: false,
+          },
+          {
+            name: "Reason",
+            value: reason,
+            inline: false,
+          },
+          {
+            name: "Messaged User  ",
+            value: dmuser,
+            inline: true,
+          },
+          {
+            name: "  Deleted messages",
+            value: `Deleted all messages from this user in the past ${purgeTime} seconds.`,
+            inline: true,
+          }
+        )
+        .setColor(0xfd9323)
+        .setFooter({
+          text: `Ban log by ${interaction.client.user.username}`,
+          iconURL: "https://slate.dan.onl/slate.png",
+        })
+        .setTimestamp();
+
+      //embed
+
       await guild.members.ban(userId).catch(console.error);
       await interaction.editReply({
         content: `**<@${userId}>** has been banned succesfully. Reason: ${reason}`,

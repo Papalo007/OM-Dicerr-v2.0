@@ -1,10 +1,22 @@
 require("dotenv").config();
 const { token, databaseToken } = process.env;
 const { connect } = require("mongoose");
-const { Client, Collection } = require("discord.js");
+const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const fs = require("fs");
 
-const client = new Client({ intents: 32767 });
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildModeration,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.DirectMessages,
+    GatewayIntentBits.DirectMessageReactions,
+    GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildMessagePolls,
+    GatewayIntentBits.DirectMessagePolls,
+  ],
+});
 client.commands = new Collection();
 client.buttons = new Collection();
 client.selectMenus = new Collection();
