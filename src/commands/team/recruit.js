@@ -1,4 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  DiscordAPIError,
+} = require("discord.js");
 const Config = require("../../schemas/config");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
@@ -100,10 +104,18 @@ module.exports = {
             content: `<@&1245743215898919143> <@${userId}> has been accepted to One More!`,
           });
         }
-
-        await targetUser.send({
-          content: `Congratulations, you have been accepted to One More!\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM papalo and ask for an invite to the OM server. I can't do that myself :(`,
-        });
+        try {
+          await targetUser.send({
+            content: `Congratulations, you have been accepted to One More!\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM papalo and ask for an invite to the OM server. I can't do that myself :(`,
+          });
+        } catch (error) {
+          console.log(error);
+          if (error.name === "DiscordAPIError[50007]") {
+            await interaction.editReply({
+              content: `This person has DMs disabled, so I couldn't DM them.`,
+            });
+          }
+        }
       }
       team = "One More";
     } else if (team === "TM" || team === "Two More" || team === "tm") {
@@ -134,10 +146,18 @@ module.exports = {
             content: `<@&1245743215898919143> <@${userId}> has been accepted to Two More!`,
           });
         }
-
-        await targetUser.send({
-          content: `Congratulations, you have been accepted to Two More! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
-        });
+        try {
+          await targetUser.send({
+            content: `Congratulations, you have been accepted to Two More! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
+          });
+        } catch (error) {
+          console.log(error);
+          if (error.name === "DiscordAPIError[50007]") {
+            await interaction.editReply({
+              content: `This person has DMs disabled, so I couldn't DM them.`,
+            });
+          }
+        }
       }
       team = "Two More";
     }

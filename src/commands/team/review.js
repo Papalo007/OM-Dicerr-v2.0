@@ -36,13 +36,6 @@ module.exports = {
     const mongoClient = new MongoClient(databaseToken);
 
     const user = interaction.options.getUser("target");
-    const temp = await new Temp({
-      _id: new mongoose.Types.ObjectId(),
-      tempValueOne: "app-review",
-      tempValueTwo: user.id,
-      tempValueThree: interaction.user.id,
-    });
-    await temp.save().catch(console.error);
 
     if (
       interaction.user !== user &&
@@ -266,6 +259,14 @@ module.exports = {
         components: [firstActionRow, secondActionRow],
       });
     }
+
+    const temp = await new Temp({
+      _id: new mongoose.Types.ObjectId(),
+      tempValueOne: "app-review",
+      tempValueTwo: user.id,
+      tempValueThree: interaction.user.id,
+    });
+    await temp.save().catch(console.error);
 
     setTimeout(() => {
       const myDB = mongoClient.db("test");
