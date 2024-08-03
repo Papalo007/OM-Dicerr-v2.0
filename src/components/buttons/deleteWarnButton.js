@@ -4,7 +4,6 @@ const {
   StringSelectMenuOptionBuilder,
 } = require("discord.js");
 const Temp = require("../../schemas/temp");
-const Config = require("../../schemas/config");
 const { databaseToken } = process.env;
 const { MongoClient } = require("mongodb");
 
@@ -54,7 +53,7 @@ module.exports = {
       menu.addOptions(
         new StringSelectMenuOptionBuilder({
           label: `${doc.date} - ${doc.reason}`,
-          value: doc._id,
+          value: doc.date + doc.reason,
         })
       );
     }

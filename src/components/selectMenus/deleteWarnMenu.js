@@ -10,6 +10,7 @@ module.exports = {
   },
   async execute(interaction, client) {
     await interaction.deferReply();
+    const dateReason = interaction.values[0];
 
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
@@ -19,7 +20,9 @@ module.exports = {
       return;
     }
 
-    const warn = await Warning.findOne({ _id: interaction.values[0] });
+    const warn = await Warning.findOne({ reason: dateReason.substring(10), date: dateReason.substring(0, 10) });
+
+
     if (!warn) {
       await interaction.editReply({
         content: `This warning doesn't exist anymore`,
@@ -49,7 +52,7 @@ module.exports = {
 
     const myDB = mongoClient.db("test");
     const warnColl = myDB.collection("warnings");
-    const query = { _id: interaction.values[0] };
+    const query = { reason: dateReason.substring(10), date: dateReason.substring(0, 10) };
 
     const response = await interaction.editReply({
       content: `Are you sure you want to remove the warning from ${warn.date} with the reason: ${warn.reason}`,
@@ -70,10 +73,19 @@ module.exports = {
           content: `Warning has been deleted`,
           components: [],
         });
-        await warnColl.deleteOne(query).catch(console.error);
-        await logChannel.send(
-          `${interaction.user.tag} has removed a warning from ${warnedUser.tag}\nDate: ${warn.date}\nReason: ${warn.reason}`
-        );
+        const resultOfDel = await warnColl
+          .deleteOne(query)
+          .catch(console.error);
+        if (resultOfDel.deletedCount === 1) {
+          await logChannel.send(
+            `${interaction.user.tag} has succesfully removed a warning from ${warnedUser.tag}\nDate: ${warn.date}\nReason: ${warn.reason}`
+          );
+        } else {
+          await interaction.editReply({
+            content: `Failed to delete warning. `,
+          });
+          return;
+        }
       } else if (confirmation.customId === "cancel") {
         await confirmation.update({
           content: "Action cancelled",

@@ -75,7 +75,7 @@ module.exports = {
 
     let year = date_time.getFullYear();
 
-    const datentime = year + "-" + month + "-" + date;
+    const datentime = date + "/" + month + "/" + year;
 
     if (dmUser.toLowerCase() !== "no" && dmUser.toLowerCase() !== "yes") {
       interaction.editReply({
@@ -92,6 +92,7 @@ module.exports = {
         });
       } catch (error) {
         dmUser = "failed";
+        console.log(error);
       }
     }
 
