@@ -44,6 +44,9 @@ module.exports = {
     await page.goto(trackerLink);
     await page.screenshot({ path: "screenshotLol.png" }); //For troubleshooting
 
+
+    //TODO: Make these more specific using css selectors + unique variables for each one going in the embed.
+
     let texts = [];
     try {
       for (let i = 0; i < 44; i++) {
@@ -55,24 +58,34 @@ module.exports = {
       }
     } catch (error) {
       console.log(error);
-      let elements = await page.locator("h1").textContent();
-      if (elements === "404") {
-        await interaction.editReply({
-          content: `404\nCouldn't find the player "${target}"`,
-          ephemeral: true,
-        });
-        return;
-      } else if (elements === "tracker.gg") {
-        await interaction.editReply({
-          content: `The bot couldn't get past the human verification check.`,
-          ephemeral: true,
-        });
-        return;
-      } else {
-        await interaction.editReply({
-          content: `An unknown error occurred while trying to gather information about this player. Please check the bot terminal for further information.`,
-        });
-        console.log("An unknown error occurred");
+      try {
+        let elements = await page.locator("h1").textContent();
+        if (elements === "404") {
+          await interaction.editReply({
+            content: `404\nCouldn't find the player "${target}"`,
+            ephemeral: true,
+          });
+          return;
+        } else if (elements === "tracker.gg") {
+          await interaction.editReply({
+            content: `The bot couldn't get past the human verification check.`,
+            ephemeral: true,
+          });
+          return;
+        } else {
+          await interaction.editReply({
+            content: `An unknown error occurred while trying to gather information about this player. Please check the bot terminal for further information.`,
+          });
+          console.log("An unknown error occurred");
+        }
+      } catch (error) {
+        let elements = await page.locator("css=span.font-light").textContent();
+        if (elements.toLowerCase().includes("profile is private")) {
+          await interaction.editReply({
+            content: `${target}'s profile is private, so I cannot access any information regarding this player :(`,
+          });
+          return;
+        }
       }
     }
 
@@ -85,18 +98,24 @@ module.exports = {
       .nth(1)
       .textContent();
 
-    const name = await page.locator("css=span.trn-ign__username").first().textContent();
-    let discriminator = await page.locator("css=span.trn-ign__discriminator").first().textContent();
+    const name = await page
+      .locator("css=span.trn-ign__username")
+      .first()
+      .textContent();
+    let discriminator = await page
+      .locator("css=span.trn-ign__discriminator")
+      .first()
+      .textContent();
     discriminator = discriminator.slice(1);
 
     // EMBED HERE
     const embed = new EmbedBuilder()
       .setAuthor({
         name: "Moderator Dicerr",
-        url: trackerLink,
         iconURL: interaction.client.user.displayAvatarURL(),
       })
       .setTitle(`${name}${discriminator}'s Valorant statistics`)
+      .setURL(trackerLink)
       .setDescription(`${mode} overview of ${episode}`)
       .addFields(
         {
@@ -126,12 +145,17 @@ module.exports = {
         },
         {
           name: "Current/Peak Rank",
-          value: `${texts[0]}/ ${texts[1]}` || "Couldn't find any info on that :/",
+          value:
+            `${texts[0]}/ ${texts[1]}` || "Couldn't find any info on that :/",
           inline: true,
         },
         {
           name: "__Most Played Agent__",
-          value: `${texts[29] || "Couldn't find any info on that :/"} (${texts[30] || "Couldn't find any info on that :/"} matches)\n\n__Statistics with ${texts[29] || "Couldn't find any info on that :/"}:__`,
+          value: `${texts[29] || "Couldn't find any info on that :/"} (${
+            texts[30] || "Couldn't find any info on that :/"
+          } matches)\n\n__Statistics with ${
+            texts[29] || "Couldn't find any info on that :/"
+          }:__`,
           inline: false,
         },
         {
@@ -151,7 +175,11 @@ module.exports = {
         },
         {
           name: "__Second Most Played Agent__",
-          value: `${texts[36] || "Couldn't find any info on that :/"} (${texts[37] || "Couldn't find any info on that :/"} matches)\n\n__Statistics with ${texts[36] || "Couldn't find any info on that :/"}:__`,
+          value: `${texts[36] || "Couldn't find any info on that :/"} (${
+            texts[37] || "Couldn't find any info on that :/"
+          } matches)\n\n__Statistics with ${
+            texts[36] || "Couldn't find any info on that :/"
+          }:__`,
           inline: false,
         },
         {
