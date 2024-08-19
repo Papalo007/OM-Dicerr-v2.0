@@ -44,18 +44,32 @@ module.exports = {
     await page.goto(trackerLink);
     await page.screenshot({ path: "screenshotLol.png" }); //For troubleshooting
 
+    let rank;
+    let pRank;
+    let dmr;
+    let matches1;
+    let matches2;
+    let kd;
+    let bestAgent;
+    let secondBestAgent;
+    let kd2;
+    let dmr2;
+    let hs;
+    let kast;
+    let win;
+    let win2;
+    let win1;
+    let dmr1;
+    let kd1;
+    let mode;
+    let rankImgLink;
+    let embed;
 
-    //TODO: Make these more specific using css selectors + unique variables for each one going in the embed.
-
-    let texts = [];
     try {
-      for (let i = 0; i < 44; i++) {
-        let elements = await page.locator(".value").nth(i).textContent();
-        if (!elements) {
-          break;
-        }
-        texts.push(elements);
-      }
+      mode = await page
+        .locator("css=li.multi-switch__item--selected span")
+        .nth(0)
+        .textContent();
     } catch (error) {
       console.log(error);
       try {
@@ -89,10 +103,24 @@ module.exports = {
       }
     }
 
-    const mode = await page
-      .locator("css=li.multi-switch__item--selected span")
-      .nth(0)
-      .textContent();
+    if (mode === "Competitive") {
+      rank = await page
+        .locator(
+          'css=div[class="rating-summary__content"] div.rating-entry div.value'
+        )
+        .textContent();
+      pRank = await page
+        .locator(
+          "css=div.rating-summary__content.rating-summary__content--secondary div.rating-entry div.value"
+        )
+        .textContent();
+      rankImgLink = await page
+        .locator(
+          'css=div[class="rating-summary__content"] div.rating-entry__rank-icon img'
+        )
+        .getAttribute("src");
+    }
+
     const episode = await page
       .locator("css=li.multi-switch__item--selected span")
       .nth(1)
@@ -108,104 +136,245 @@ module.exports = {
       .textContent();
     discriminator = discriminator.slice(1);
 
-    // EMBED HERE
-    const embed = new EmbedBuilder()
-      .setAuthor({
-        name: "Moderator Dicerr",
-        iconURL: interaction.client.user.displayAvatarURL(),
-      })
-      .setTitle(`${name}${discriminator}'s Valorant statistics`)
-      .setURL(trackerLink)
-      .setDescription(`${mode} overview of ${episode}`)
-      .addFields(
-        {
-          name: "Dmg/Round",
-          value: texts[12] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "K/D",
-          value: texts[13] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "HS %",
-          value: texts[14] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "KAST",
-          value: texts[17] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "Win %",
-          value: texts[15] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "Current/Peak Rank",
-          value:
-            `${texts[0]}/ ${texts[1]}` || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "__Most Played Agent__",
-          value: `${texts[29] || "Couldn't find any info on that :/"} (${
-            texts[30] || "Couldn't find any info on that :/"
-          } matches)\n\n__Statistics with ${
-            texts[29] || "Couldn't find any info on that :/"
-          }:__`,
-          inline: false,
-        },
-        {
-          name: "Dmg/Round",
-          value: texts[33] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "K/D",
-          value: texts[32] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "Win %",
-          value: texts[31] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "__Second Most Played Agent__",
-          value: `${texts[36] || "Couldn't find any info on that :/"} (${
-            texts[37] || "Couldn't find any info on that :/"
-          } matches)\n\n__Statistics with ${
-            texts[36] || "Couldn't find any info on that :/"
-          }:__`,
-          inline: false,
-        },
-        {
-          name: "Dmg/Round",
-          value: texts[40] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "K/D",
-          value: texts[39] || "Couldn't find any info on that :/",
-          inline: true,
-        },
-        {
-          name: "Win %",
-          value: texts[38] || "Couldn't find any info on that :/",
-          inline: true,
-        }
+    dmr = await page
+      .locator(
+        "css=div.giant:nth-child(1) > div:nth-child(1) > div:nth-child(2) > span:nth-child(1)"
       )
-      .setColor("#ff8000")
-      .setFooter({
-        text: "Valorant Stats by Dicerr",
-        iconURL:
-          "https://toppng.com/uploads/preview/valorant-logo-icon-11608279985p9bg0vbcxu.png",
-      })
-      .setTimestamp();
-    // EMBED HERE
+      .textContent();
+    hs = await page
+      .locator(
+        "css=div.giant:nth-child(3) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
+      )
+      .textContent();
+    win = await page
+      .locator(
+        "css=div.giant:nth-child(4) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
+      )
+      .textContent();
+    kd = await page
+      .locator(
+        "css=div.giant:nth-child(2) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
+      )
+      .textContent();
+    kast = await page
+      .locator(
+        ".main > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
+      )
+      .textContent();
+
+    bestAgent = await page
+      .locator(
+        "css=div.st-content__item:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)"
+      )
+      .textContent();
+    matches1 = await page
+      .locator(
+        "css=div.st-content__item-value--highlight:nth-child(2) > div:nth-child(1) > div:nth-child(1)"
+      )
+      .textContent();
+    win1 = await page
+      .locator(
+        "css=div.st-content__item:nth-child(1) > div:nth-child(3) > div:nth-child(1) > div:nth-child(1)"
+      )
+      .textContent();
+    dmr1 = await page
+      .locator(
+        "css=div.st-content__item:nth-child(1) > div:nth-child(5) > div:nth-child(1) > div:nth-child(1)"
+      )
+      .textContent();
+    kd1 = await page
+      .locator(
+        "css=div.st-content__item:nth-child(1) > div:nth-child(4) > div:nth-child(1) > div:nth-child(1)"
+      )
+      .textContent();
+
+    try {
+      secondBestAgent = await page
+        .locator(
+          "css=div.st-content__item:nth-child(3) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)"
+        )
+        .textContent();
+      matches2 = await page
+        .locator(
+          "css=div.st-content__item:nth-child(3) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1)"
+        )
+        .textContent();
+      win2 = await page
+        .locator(
+          "css=div.st-content__item-value--highlight:nth-child(3) > div:nth-child(1) > div:nth-child(1)"
+        )
+        .textContent();
+      kd2 = await page
+        .locator(
+          "css=div.st-content__item-value--highlight:nth-child(4) > div:nth-child(1) > div:nth-child(1)"
+        )
+        .textContent();
+      dmr2 = await page
+        .locator(
+          "css=div.st-content__item-value--highlight:nth-child(5) > div:nth-child(1) > div:nth-child(1)"
+        )
+        .textContent();
+
+      embed = new EmbedBuilder()
+        .setAuthor({
+          name: "Moderator Dicerr",
+          iconURL: interaction.client.user.displayAvatarURL(),
+        })
+        .setTitle(`${name}${discriminator}'s Valorant statistics`)
+        .setURL(trackerLink)
+        .setDescription(`${mode} overview of ${episode}`)
+        .addFields(
+          {
+            name: "Dmg/Round",
+            value: dmr,
+            inline: true,
+          },
+          {
+            name: "K/D",
+            value: kd,
+            inline: true,
+          },
+          {
+            name: "HS %",
+            value: hs,
+            inline: true,
+          },
+          {
+            name: "KAST",
+            value: kast,
+            inline: true,
+          },
+          {
+            name: "Win %",
+            value: win,
+            inline: true,
+          },
+          {
+            name: "Current/Peak Rank",
+            value: `${rank}/ ${pRank}`,
+            inline: true,
+          },
+          {
+            name: "__Most Played Agent__",
+            value: `${bestAgent} (${matches1} matches)\n\n__Statistics with ${bestAgent}:__`,
+            inline: false,
+          },
+          {
+            name: "Dmg/Round",
+            value: dmr1,
+            inline: true,
+          },
+          {
+            name: "K/D",
+            value: kd1,
+            inline: true,
+          },
+          {
+            name: "Win %",
+            value: win1,
+            inline: true,
+          },
+          {
+            name: "__Second Most Played Agent__",
+            value: `${secondBestAgent} (${matches2} matches)\n\n__Statistics with ${secondBestAgent}:__`,
+            inline: false,
+          },
+          {
+            name: "Dmg/Round",
+            value: dmr2,
+            inline: true,
+          },
+          {
+            name: "K/D",
+            value: kd2,
+            inline: true,
+          },
+          {
+            name: "Win %",
+            value: win2,
+            inline: true,
+          }
+        )
+        .setColor("#ff8000")
+        .setFooter({
+          text: "Valorant Stats by Dicerr",
+          iconURL:
+            "https://toppng.com/uploads/preview/valorant-logo-icon-11608279985p9bg0vbcxu.png",
+        })
+        .setThumbnail(rankImgLink)
+        .setTimestamp();
+    } catch (error) {
+      console.log(error);
+
+      embed = new EmbedBuilder()
+        .setAuthor({
+          name: "Moderator Dicerr",
+          iconURL: interaction.client.user.displayAvatarURL(),
+        })
+        .setTitle(`${name}${discriminator}'s Valorant statistics`)
+        .setURL(trackerLink)
+        .setDescription(`${mode} overview of ${episode}`)
+        .addFields(
+          {
+            name: "Dmg/Round",
+            value: dmr,
+            inline: true,
+          },
+          {
+            name: "K/D",
+            value: kd,
+            inline: true,
+          },
+          {
+            name: "HS %",
+            value: hs,
+            inline: true,
+          },
+          {
+            name: "KAST",
+            value: kast,
+            inline: true,
+          },
+          {
+            name: "Win %",
+            value: win,
+            inline: true,
+          },
+          {
+            name: "Current/Peak Rank",
+            value: `${rank}/ ${pRank}`,
+            inline: true,
+          },
+          {
+            name: "__Most Played Agent__",
+            value: `${bestAgent} (${matches1} matches)\n\n__Statistics with ${bestAgent}:__`,
+            inline: false,
+          },
+          {
+            name: "Dmg/Round",
+            value: dmr1,
+            inline: true,
+          },
+          {
+            name: "K/D",
+            value: kd1,
+            inline: true,
+          },
+          {
+            name: "Win %",
+            value: win1,
+            inline: true,
+          }
+        )
+        .setColor("#ff8000")
+        .setFooter({
+          text: "Valorant Stats by Dicerr",
+          iconURL:
+            "https://toppng.com/uploads/preview/valorant-logo-icon-11608279985p9bg0vbcxu.png",
+        })
+        .setThumbnail(rankImgLink)
+        .setTimestamp();
+    }
 
     await browser.close();
     await interaction.editReply({
