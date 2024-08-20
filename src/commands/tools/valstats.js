@@ -34,9 +34,8 @@ module.exports = {
       }
     }
     await interaction.deferReply();
-
     const target = interaction.options.getString("target");
-    const targetInHex = replaceNonAlphanumericWithHex(target);
+    const targetInHex = replaceHashtagWithHex(target);
     const trackerLink = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
 
     const browser = await chromium.launch();
@@ -84,6 +83,12 @@ module.exports = {
           await interaction.editReply({
             content: `The bot couldn't get past the human verification check.`,
             ephemeral: true,
+          });
+          return;
+        } else if (elements.toLowerCase() === "bad request") {
+          await interaction.editReply({
+            content: `Bad Request.`,
+            ephemeral: false,
           });
           return;
         } else {
@@ -136,58 +141,47 @@ module.exports = {
       .textContent();
     discriminator = discriminator.slice(1);
 
+    //Giant Stats
     dmr = await page
-      .locator(
-        "css=div.giant:nth-child(1) > div:nth-child(1) > div:nth-child(2) > span:nth-child(1)"
-      )
+      .locator('css=div.giant-stats [title="Damage/Round"] + span')
       .textContent();
     hs = await page
-      .locator(
-        "css=div.giant:nth-child(3) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
-      )
+      .locator('css=div.giant-stats [title="Headshot %"] + span')
       .textContent();
     win = await page
-      .locator(
-        "css=div.giant:nth-child(4) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
-      )
+      .locator('css=div.giant-stats [title="Win %"] + span')
       .textContent();
     kd = await page
-      .locator(
-        "css=div.giant:nth-child(2) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
-      )
-      .textContent();
-    kast = await page
-      .locator(
-        ".main > div:nth-child(2) > div:nth-child(1) > div:nth-child(2) > span:nth-child(2) > span:nth-child(1)"
-      )
+      .locator('css=div.giant-stats [title="K/D Ratio"] + span')
       .textContent();
 
+    //Main
+    kast = await page
+      .locator('css=div.main div.numbers [title="KAST"] + span span.value')
+      .textContent();
+
+    //Agents
     bestAgent = await page
-      .locator(
-        "css=div.st-content__item:nth-child(1) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)"
-      )
+      .locator("css=div.st-content__item div.info div.value")
+      .first()
       .textContent();
     matches1 = await page
-      .locator(
-        "css=div.st-content__item-value--highlight:nth-child(2) > div:nth-child(1) > div:nth-child(1)"
-      )
+      .locator("css=div.st-content__item div.info div.value")
+      .nth(1)
       .textContent();
     win1 = await page
-      .locator(
-        "css=div.st-content__item:nth-child(1) > div:nth-child(3) > div:nth-child(1) > div:nth-child(1)"
-      )
+      .locator("css=div.st-content__item div.info div.value")
+      .nth(2)
       .textContent();
     dmr1 = await page
-      .locator(
-        "css=div.st-content__item:nth-child(1) > div:nth-child(5) > div:nth-child(1) > div:nth-child(1)"
-      )
+      .locator("css=div.st-content__item div.info div.value")
+      .nth(4)
       .textContent();
     kd1 = await page
-      .locator(
-        "css=div.st-content__item:nth-child(1) > div:nth-child(4) > div:nth-child(1) > div:nth-child(1)"
-      )
+      .locator("css=div.st-content__item div.info div.value")
+      .nth(3)
       .textContent();
-
+//TODO: Finish the ones below + potentially make the ones above more reliable
     try {
       secondBestAgent = await page
         .locator(
@@ -221,7 +215,7 @@ module.exports = {
           iconURL: interaction.client.user.displayAvatarURL(),
         })
         .setTitle(`${name}${discriminator}'s Valorant statistics`)
-        .setURL(trackerLink)
+        .setURL(page.url())
         .setDescription(`${mode} overview of ${episode}`)
         .addFields(
           {
@@ -312,7 +306,7 @@ module.exports = {
           iconURL: interaction.client.user.displayAvatarURL(),
         })
         .setTitle(`${name}${discriminator}'s Valorant statistics`)
-        .setURL(trackerLink)
+        .setURL(page.url())
         .setDescription(`${mode} overview of ${episode}`)
         .addFields(
           {
@@ -383,8 +377,6 @@ module.exports = {
   },
 };
 
-function replaceNonAlphanumericWithHex(input) {
-  return input.replace(/[^A-Za-z0-9]/g, (match) => {
-    return "%" + match.charCodeAt(0).toString(16).toUpperCase();
-  });
+function replaceHashtagWithHex(input) {
+  return input.replace(/#/g, "%23");
 }

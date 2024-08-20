@@ -21,10 +21,18 @@ module.exports = {
               ephemeral: true,
             });
           } else {
-            await interaction.deferReply({
-              content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
-              ephemeral: true,
-            });
+            try {
+              await interaction.deferReply({
+                content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
+                ephemeral: true,
+              });
+            } catch (error) {
+              await interaction.editReply({
+                content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
+                ephemeral: true,
+              });
+            }
+
           }
         }
       } else {
