@@ -126,6 +126,10 @@ module.exports = {
         .getAttribute("src");
     }
 
+    rank ||= "N ";
+    pRank ||= "A";
+    rankImgLink ||= "https://images.1v9.gg/unrankedfix-9535dccc99d8.webp";
+
     const episode = await page
       .locator("css=li.multi-switch__item--selected span")
       .nth(1)
@@ -162,51 +166,46 @@ module.exports = {
 
     //Agents
     bestAgent = await page
-      .locator("css=div.st-content__item div.info div.value")
+      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
       .first()
       .textContent();
     matches1 = await page
-      .locator("css=div.st-content__item div.info div.value")
+      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
       .nth(1)
       .textContent();
     win1 = await page
-      .locator("css=div.st-content__item div.info div.value")
+      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
       .nth(2)
       .textContent();
     dmr1 = await page
-      .locator("css=div.st-content__item div.info div.value")
+      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
       .nth(4)
       .textContent();
     kd1 = await page
-      .locator("css=div.st-content__item div.info div.value")
+      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
       .nth(3)
       .textContent();
-//TODO: Finish the ones below + potentially make the ones above more reliable
+
     try {
       secondBestAgent = await page
-        .locator(
-          "css=div.st-content__item:nth-child(3) > div:nth-child(1) > div:nth-child(2) > div:nth-child(1)"
-        )
+        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
+        .first()
         .textContent();
       matches2 = await page
-        .locator(
-          "css=div.st-content__item:nth-child(3) > div:nth-child(2) > div:nth-child(1) > div:nth-child(1)"
-        )
+        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
+        .nth(1)
         .textContent();
       win2 = await page
-        .locator(
-          "css=div.st-content__item-value--highlight:nth-child(3) > div:nth-child(1) > div:nth-child(1)"
-        )
+        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
+        .nth(2)
         .textContent();
       kd2 = await page
-        .locator(
-          "css=div.st-content__item-value--highlight:nth-child(4) > div:nth-child(1) > div:nth-child(1)"
-        )
+        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
+        .nth(3)
         .textContent();
       dmr2 = await page
-        .locator(
-          "css=div.st-content__item-value--highlight:nth-child(5) > div:nth-child(1) > div:nth-child(1)"
-        )
+        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
+        .nth(4)
         .textContent();
 
       embed = new EmbedBuilder()
@@ -370,7 +369,7 @@ module.exports = {
         .setTimestamp();
     }
 
-    await browser.close();
+    await page.close();
     await interaction.editReply({
       embeds: [embed],
     });
