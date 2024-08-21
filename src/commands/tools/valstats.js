@@ -35,7 +35,7 @@ module.exports = {
     }
     await interaction.deferReply();
     const target = interaction.options.getString("target");
-    const targetInHex = replaceHashtagWithHex(target);
+    const targetInHex = target.replace(/#/g, "%23");
     const trackerLink = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
 
     const browser = await chromium.launch();
@@ -43,35 +43,24 @@ module.exports = {
     await page.goto(trackerLink);
     await page.screenshot({ path: "screenshotLol.png" }); //For troubleshooting
 
-    let rank;
-    let pRank;
-    let dmr;
-    let matches1;
-    let matches2;
-    let kd;
-    let bestAgent;
-    let secondBestAgent;
-    let kd2;
-    let dmr2;
-    let hs;
-    let kast;
-    let win;
-    let win2;
-    let win1;
-    let dmr1;
-    let kd1;
+    let rank = "N ";
+    let pRank = "A";
+    let rankImgLink = "https://images.1v9.gg/unrankedfix-9535dccc99d8.webp";
     let mode;
-    let rankImgLink;
     let embed;
 
-    try {
+    const elementExists = await page
+      .locator("css=li.multi-switch__item--selected span")
+      .nth(0)
+      .count();
+    if (elementExists) {
       mode = await page
         .locator("css=li.multi-switch__item--selected span")
         .nth(0)
         .textContent();
-    } catch (error) {
-      console.log(error);
-      try {
+    } else {
+      let elementExists2 = await page.locator("h1").count();
+      if (elementExists2) {
         let elements = await page.locator("h1").textContent();
         if (elements === "404") {
           await interaction.editReply({
@@ -97,116 +86,70 @@ module.exports = {
           });
           console.log("An unknown error occurred");
         }
-      } catch (error) {
+      } else {
         let elements = await page.locator("css=span.font-light").textContent();
         if (elements.toLowerCase().includes("profile is private")) {
           await interaction.editReply({
             content: `${target}'s profile is private, so I cannot access any information regarding this player :(`,
           });
           return;
+        } else {
+          await interaction.editReply({
+            content: `An unknown error occurred. Please create a support ticket with a screenshot of this error message.\ntarget=${target}`,
+          });
         }
       }
     }
 
     if (mode === "Competitive") {
-      rank = await page
-        .locator(
-          'css=div[class="rating-summary__content"] div.rating-entry div.value'
-        )
-        .textContent();
-      pRank = await page
-        .locator(
-          "css=div.rating-summary__content.rating-summary__content--secondary div.rating-entry div.value"
-        )
-        .textContent();
-      rankImgLink = await page
-        .locator(
-          'css=div[class="rating-summary__content"] div.rating-entry__rank-icon img'
-        )
-        .getAttribute("src");
+      //prettier-ignore
+      [rank, pRank, rankImgLink] = await Promise.all([
+        page.locator('css=div[class="rating-summary__content"] div.rating-entry div.value').textContent(),
+        page.locator("css=div.rating-summary__content.rating-summary__content--secondary div.rating-entry div.value").textContent(),
+        page.locator('css=div[class="rating-summary__content"] div.rating-entry__rank-icon img').getAttribute("src"),
+      ]);
     }
 
-    rank ||= "N ";
-    pRank ||= "A";
-    rankImgLink ||= "https://images.1v9.gg/unrankedfix-9535dccc99d8.webp";
-
-    const episode = await page
-      .locator("css=li.multi-switch__item--selected span")
-      .nth(1)
-      .textContent();
-
-    const name = await page
-      .locator("css=span.trn-ign__username")
-      .first()
-      .textContent();
-    let discriminator = await page
-      .locator("css=span.trn-ign__discriminator")
-      .first()
-      .textContent();
-    discriminator = discriminator.slice(1);
+    //prettier-ignore
+    const [episode, name, discriminator] = await Promise.all([
+      page.locator("css=li.multi-switch__item--selected span").nth(1).textContent(),
+      page.locator("css=span.trn-ign__username").first().textContent(),
+      page.locator("css=span.trn-ign__discriminator").first().textContent().then((d) => d.slice(1)),
+    ]);
 
     //Giant Stats
-    dmr = await page
-      .locator('css=div.giant-stats [title="Damage/Round"] + span')
-      .textContent();
-    hs = await page
-      .locator('css=div.giant-stats [title="Headshot %"] + span')
-      .textContent();
-    win = await page
-      .locator('css=div.giant-stats [title="Win %"] + span')
-      .textContent();
-    kd = await page
-      .locator('css=div.giant-stats [title="K/D Ratio"] + span')
-      .textContent();
+    //prettier-ignore
+    const [dmr, hs, win, kd] = await Promise.all([
+      page.locator('css=div.giant-stats [title="Damage/Round"] + span').textContent(),
+      page.locator('css=div.giant-stats [title="Headshot %"] + span').textContent(),
+      page.locator('css=div.giant-stats [title="Win %"] + span').textContent(),
+      page.locator('css=div.giant-stats [title="K/D Ratio"] + span').textContent(),
+    ]);
 
     //Main
-    kast = await page
+    const kast = await page
       .locator('css=div.main div.numbers [title="KAST"] + span span.value')
       .textContent();
 
     //Agents
-    bestAgent = await page
-      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
-      .first()
-      .textContent();
-    matches1 = await page
-      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
-      .nth(1)
-      .textContent();
-    win1 = await page
-      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
-      .nth(2)
-      .textContent();
-    dmr1 = await page
-      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
-      .nth(4)
-      .textContent();
-    kd1 = await page
-      .locator("css=div.st-content__item:nth-child(1) div.info div.value")
-      .nth(3)
-      .textContent();
+    //prettier-ignore
+    const [bestAgent, matches1, win1, dmr1, kd1] = await Promise.all([
+      page.locator("css=div.st-content__item:nth-child(1) div.info div.value").first().textContent(),
+      page.locator("css=div.st-content__item:nth-child(1) div.info div.value").nth(1).textContent(),
+      page.locator("css=div.st-content__item:nth-child(1) div.info div.value").nth(2).textContent(),
+      page.locator("css=div.st-content__item:nth-child(1) div.info div.value").nth(4).textContent(),
+      page.locator("css=div.st-content__item:nth-child(1) div.info div.value").nth(3).textContent(),
+    ]);
 
     try {
-      secondBestAgent = await page
-        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
-        .first()
-        .textContent();
-      matches2 = await page
-        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
-        .nth(1)
-        .textContent();
-      win2 = await page
-        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
-        .nth(2)
-        .textContent();
-      kd2 = await page
-        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
-        .nth(3)
-        .textContent();
-      dmr2 = await page
-        .locator("css=div.st-content__item:nth-child(3) div.info div.value")
-        .nth(4)
-        .textContent();
+      //prettier-ignore
+      const [secondBestAgent, matches2, win2, kd2, dmr2] = await Promise.all([
+        page.locator("css=div.st-content__item:nth-child(3) div.info div.value").first().textContent(),
+        page.locator("css=div.st-content__item:nth-child(3) div.info div.value").nth(1).textContent(),
+        page.locator("css=div.st-content__item:nth-child(3) div.info div.value").nth(2).textContent(),
+        page.locator("css=div.st-content__item:nth-child(3) div.info div.value").nth(3).textContent(),
+        page.locator("css=div.st-content__item:nth-child(3) div.info div.value").nth(4).textContent(),
+      ]);
 
       embed = new EmbedBuilder()
         .setAuthor({
@@ -217,31 +160,11 @@ module.exports = {
         .setURL(page.url())
         .setDescription(`${mode} overview of ${episode}`)
         .addFields(
-          {
-            name: "Dmg/Round",
-            value: dmr,
-            inline: true,
-          },
-          {
-            name: "K/D",
-            value: kd,
-            inline: true,
-          },
-          {
-            name: "HS %",
-            value: hs,
-            inline: true,
-          },
-          {
-            name: "KAST",
-            value: kast,
-            inline: true,
-          },
-          {
-            name: "Win %",
-            value: win,
-            inline: true,
-          },
+          { name: "Dmg/Round", value: dmr, inline: true },
+          { name: "K/D", value: kd, inline: true },
+          { name: "HS %", value: hs, inline: true },
+          { name: "KAST", value: kast, inline: true },
+          { name: "Win %", value: win, inline: true },
           {
             name: "Current/Peak Rank",
             value: `${rank}/ ${pRank}`,
@@ -252,41 +175,17 @@ module.exports = {
             value: `${bestAgent} (${matches1} matches)\n\n__Statistics with ${bestAgent}:__`,
             inline: false,
           },
-          {
-            name: "Dmg/Round",
-            value: dmr1,
-            inline: true,
-          },
-          {
-            name: "K/D",
-            value: kd1,
-            inline: true,
-          },
-          {
-            name: "Win %",
-            value: win1,
-            inline: true,
-          },
+          { name: "Dmg/Round", value: dmr1, inline: true },
+          { name: "K/D", value: kd1, inline: true },
+          { name: "Win %", value: win1, inline: true },
           {
             name: "__Second Most Played Agent__",
             value: `${secondBestAgent} (${matches2} matches)\n\n__Statistics with ${secondBestAgent}:__`,
             inline: false,
           },
-          {
-            name: "Dmg/Round",
-            value: dmr2,
-            inline: true,
-          },
-          {
-            name: "K/D",
-            value: kd2,
-            inline: true,
-          },
-          {
-            name: "Win %",
-            value: win2,
-            inline: true,
-          }
+          { name: "Dmg/Round", value: dmr2, inline: true },
+          { name: "K/D", value: kd2, inline: true },
+          { name: "Win %", value: win2, inline: true }
         )
         .setColor("#ff8000")
         .setFooter({
@@ -308,31 +207,11 @@ module.exports = {
         .setURL(page.url())
         .setDescription(`${mode} overview of ${episode}`)
         .addFields(
-          {
-            name: "Dmg/Round",
-            value: dmr,
-            inline: true,
-          },
-          {
-            name: "K/D",
-            value: kd,
-            inline: true,
-          },
-          {
-            name: "HS %",
-            value: hs,
-            inline: true,
-          },
-          {
-            name: "KAST",
-            value: kast,
-            inline: true,
-          },
-          {
-            name: "Win %",
-            value: win,
-            inline: true,
-          },
+          { name: "Dmg/Round", value: dmr, inline: true },
+          { name: "K/D", value: kd, inline: true },
+          { name: "HS %", value: hs, inline: true },
+          { name: "KAST", value: kast, inline: true },
+          { name: "Win %", value: win, inline: true },
           {
             name: "Current/Peak Rank",
             value: `${rank}/ ${pRank}`,
@@ -343,21 +222,9 @@ module.exports = {
             value: `${bestAgent} (${matches1} matches)\n\n__Statistics with ${bestAgent}:__`,
             inline: false,
           },
-          {
-            name: "Dmg/Round",
-            value: dmr1,
-            inline: true,
-          },
-          {
-            name: "K/D",
-            value: kd1,
-            inline: true,
-          },
-          {
-            name: "Win %",
-            value: win1,
-            inline: true,
-          }
+          { name: "Dmg/Round", value: dmr1, inline: true },
+          { name: "K/D", value: kd1, inline: true },
+          { name: "Win %", value: win1, inline: true }
         )
         .setColor("#ff8000")
         .setFooter({
@@ -369,13 +236,9 @@ module.exports = {
         .setTimestamp();
     }
 
-    await page.close();
+    await browser.close();
     await interaction.editReply({
       embeds: [embed],
     });
   },
 };
-
-function replaceHashtagWithHex(input) {
-  return input.replace(/#/g, "%23");
-}
