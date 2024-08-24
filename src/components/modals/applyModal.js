@@ -9,10 +9,9 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-      await interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`,
+      return interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /config.`
       });
-      return;
     }
 
     const tracker = interaction.fields.getTextInputValue("tracker");

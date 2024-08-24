@@ -40,7 +40,7 @@ module.exports = {
     if (
       interaction.user !== user &&
       !interaction.member.roles.cache.some(
-        (role) => role.name === "TM Manager"
+        (role) => role.name === "TPN Manager"
       ) &&
       !interaction.member.roles.cache.some(
         (role) => role.name === "OM Manager"
@@ -82,7 +82,7 @@ module.exports = {
     if (
       interaction.user === user &&
       !interaction.member.roles.cache.some(
-        (role) => role.name === "TM Manager"
+        (role) => role.name === "TPN Manager"
       ) &&
       !interaction.member.roles.cache.some(
         (role) => role.name === "OM Manager"
@@ -227,7 +227,7 @@ module.exports = {
     if (
       interaction.user === user &&
       !interaction.member.roles.cache.some(
-        (role) => role.name === "TM Manager"
+        (role) => role.name === "TPN Manager"
       ) &&
       !interaction.member.roles.cache.some(
         (role) => role.name === "OM Manager"
@@ -281,7 +281,7 @@ module.exports = {
       if (
         interaction.user === user &&
         !interaction.member.roles.cache.some(
-          (role) => role.name === "TM Manager"
+          (role) => role.name === "TPN Manager"
         ) &&
         !interaction.member.roles.cache.some(
           (role) => role.name === "OM Manager"

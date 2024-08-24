@@ -18,21 +18,17 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-      await interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`,
+      return interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /config.`
       });
-      return;
     }
-    if (config.botCommandsChannel) {
-      const channel = client.channels.cache.get(config.botCommandsChannel);
-      if (channel !== interaction.channel) {
-        await interaction.reply({
-          content: `You cannot use commands in this channel`,
-          ephemeral: true,
-        });
-        return;
-      }
+    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+      return interaction.reply({
+        content: `You cannot use commands in this channel`,
+        ephemeral: true,
+      });
     }
+
     await interaction.deferReply();
     const target = interaction.options.getString("target");
     const targetInHex = target.replace(/#/g, "%23");

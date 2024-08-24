@@ -4,7 +4,7 @@ const Config = require("../../schemas/config");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("sack")
-    .setDescription("Kick the provided player from OM or TM")
+    .setDescription("Kick the provided player from OM or TPN")
     .setDMPermission(false)
     .addUserOption((option) =>
       option
@@ -21,20 +21,15 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-      await interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`,
+      return interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /config.`
       });
-      return;
     }
-    if (config.botCommandsChannel) {
-      const channel = client.channels.cache.get(config.botCommandsChannel);
-      if (channel !== interaction.channel) {
-        await interaction.reply({
-          content: `You cannot use commands in this channel`,
-          ephemeral: true,
-        });
-        return;
-      }
+    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+      return interaction.reply({
+        content: `You cannot use commands in this channel`,
+        ephemeral: true,
+      });
     }
 
     await interaction.deferReply({ ephemeral: true });
@@ -52,18 +47,16 @@ module.exports = {
 
     let team = interaction.options.getString("team");
     if (
-      team !== "OM" &&
-      team !== "One More" &&
-      team !== "TM" &&
-      team !== "Two More" &&
-      team !== "om" &&
-      team !== "tm"
+      team.toLowerCase() !== "one more" &&
+      team.toLowerCase() !== "typhoon" &&
+      team.toLowerCase() !== "om" &&
+      team.toLowerCase() !== "tpn"
     ) {
       await interaction.editReply({
-        content: `${team} is not a valid team. Valid options are: One More, OM, om, Two More, TM, tm.`,
+        content: `${team} is not a valid team. Valid options are: One More, OM, Typhoon, TPN (Case doesn't matter).`,
       });
       return;
-    } else if (team === "OM" || team === "One More" || team === "om") {
+    } else if (team.toLowerCase() === "one more" || team.toLowerCase() === "om") {
       if (!user.roles.cache.some((role) => role.name === "OM Roster")) {
         await interaction.editReply({
           content: `This player is not in One More.`,
@@ -74,7 +67,7 @@ module.exports = {
         !member.roles.cache.some((role) => role.name === "OM Manager")
       ) {
         await interaction.editReply({
-          content: `You are not authorised to kick people for One More.`,
+          content: `You are not authorised to kick people from One More.`,
         });
         return;
       }
@@ -87,21 +80,21 @@ module.exports = {
       }
 
       await targetUser.send({
-        content: `Unfortunately, you have been kicked from One More, however, you can still apply for a position in Two More. To do that, complete onboarding and notify a TM Manager, that you are looking to join the team.`,
+        content: `Unfortunately, you have been kicked from One More, however, you can still apply for a position in Typhoon. To do that, run the /apply command and notify a TPN Manager, that you are looking to join the team.`,
       });
       team = "One More";
-    } else if (team === "TM" || team === "Two More" || team === "tm") {
-      if (!user.roles.cache.some((role) => role.name === "TM Roster")) {
+    } else if (team.toLowerCase() === "typhoon" || team === "tpn") {
+      if (!user.roles.cache.some((role) => role.name === "TPN Roster")) {
         await interaction.editReply({
-          content: `This player is not in Two More.`,
+          content: `This player is not in Typhoon.`,
           ephemeral: true,
         });
         return;
       } else if (
-        !member.roles.cache.some((role) => role.name === "TM Manager")
+        !member.roles.cache.some((role) => role.name === "TPN Manager")
       ) {
         await interaction.editReply({
-          content: `You are not authorised to kick people for Two More.`,
+          content: `You are not authorised to kick people from Typhoon.`,
         });
         return;
       }
@@ -109,14 +102,14 @@ module.exports = {
 
       if (announcementChannel) {
         await announcementChannel.send({
-          content: `<@&1245743215898919143> <@${userId}> has been removed from Two More's roster.`,
+          content: `<@&1245743215898919143> <@${userId}> has been removed from Typhoon's roster.`,
         });
       }
 
       await targetUser.send({
-        content: `You have been kicked from Two More.`,
+        content: `You have been kicked from Typhoon.`,
       });
-      team = "Two More";
+      team = "Typhoon";
     }
 
     const logEmbed = new EmbedBuilder()

@@ -57,14 +57,14 @@ module.exports = {
       .setLabel("One More")
       .setStyle(ButtonStyle.Primary);
 
-    const tmButton = new ButtonBuilder()
-      .setCustomId("tm")
-      .setLabel("Two More")
+    const tpnButton = new ButtonBuilder()
+      .setCustomId("tpn")
+      .setLabel("Typhoon")
       .setStyle(ButtonStyle.Success);
 
     const firstActionRow = new ActionRowBuilder().addComponents(
       omButton,
-      tmButton
+      tpnButton
     );
 
     const response = await interaction.editReply({
@@ -108,14 +108,14 @@ module.exports = {
 
           team = "One More";
         }
-      } else if (confirmation.customId === "tm") {
+      } else if (confirmation.customId === "tpn") {
         if (
           !interaction.member.roles.cache.some(
-            (role) => role.name === "TM Manager"
+            (role) => role.name === "TPN Manager"
           )
         ) {
           await confirmation.update({
-            content: `You are not authorised to recruit people for Two More.`,
+            content: `You are not authorised to recruit people for Typhoon.`,
             components: [],
           });
           return;
@@ -125,15 +125,15 @@ module.exports = {
 
           if (announcementChannel) {
             await announcementChannel.send({
-              content: `<@&1245743215898919143> <@${user}> has been accepted to Two More!`, 
+              content: `<@&1245743215898919143> <@${user}> has been recruited to Typhoon!`, 
             });
           }
 
           await targetUser.send({
-            content: `Congratulations, you have been accepted to Two More! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
+            content: `Congratulations, you have been accepted to Typhoon! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
           });
 
-          team = "Two More";
+          team = "Typhoon";
         }
       }
     } catch (e) {
