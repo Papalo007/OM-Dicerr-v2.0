@@ -1,19 +1,22 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const Config = require("../../schemas/config");
+const Link = require("../../schemas/link");
 const { chromium } = require("playwright-extra");
 const stealth = require("puppeteer-extra-plugin-stealth")();
 chromium.use(stealth);
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("valstats-id")
-    .setDescription("Returns the statistics of the provided user in Valorant.")
+    .setName("valstats")
+    .setDescription(
+      "Returns the statistics of the provided Discord user in Valorant."
+    )
     .setDMPermission(false)
-    .addStringOption((option) =>
+    .addUserOption((option) =>
       option
-        .setName("target")
-        .setDescription("The riot id of the user (Username#ID)")
-        .setRequired(true)
+        .setName("user")
+        .setDescription("The member whose statistics you want.")
+        .setRequired(false)
     ),
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
@@ -34,7 +37,20 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const target = interaction.options.getString("target");
+    const user = interaction.options.getUser("user") || interaction.user;
+    const linkin = await Link.findOne({ userID: user.id });
+    if (!linkin) {
+      return await interaction.editReply({
+        content: `This user hasn't linked their valorant account.`,
+      });
+    }
+    if (linkin.status === "private") {
+      return await interaction.editReply({
+        content: `This user's valorant account is private.`,
+      });
+    }
+
+    const target = linkin.riotID;
     const targetInHex = target.replace(/#/g, "%23");
     const trackerLink = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
 
@@ -105,17 +121,9 @@ module.exports = {
           console.log("An unknown error occurred");
         }
       } else {
-        let elements = await page.locator("css=span.font-light").textContent();
-        if (elements.toLowerCase().includes("profile is private")) {
-          await interaction.editReply({
-            content: `${target}'s profile is private, so I cannot access any information regarding this player :(`,
-          });
-          return;
-        } else {
-          await interaction.editReply({
-            content: `An unknown error occurred. Please create a support ticket with a screenshot of this error message.\ntarget=${target}`,
-          });
-        }
+        await interaction.editReply({
+          content: `An unknown error occurred. Please create a support ticket with a screenshot of this error message.\ntarget=${target}`,
+        });
       }
     }
 
