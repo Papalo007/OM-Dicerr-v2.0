@@ -48,6 +48,7 @@ module.exports = {
     let rankImgLink = "https://images.1v9.gg/unrankedfix-9535dccc99d8.webp";
     let mode;
     let embed;
+    let episode;
 
     await page.waitForTimeout(500);
 
@@ -60,6 +61,22 @@ module.exports = {
         .locator("css=li.multi-switch__item--selected span")
         .nth(0)
         .textContent();
+
+      if (mode === "PC" || mode === "Console") {
+        mode = await page
+          .locator("css=li.multi-switch__item--selected span")
+          .nth(1)
+          .textContent();
+        episode = await page
+          .locator("css=li.multi-switch__item--selected span")
+          .nth(2)
+          .textContent();
+      } else {
+        episode = await page
+          .locator("css=li.multi-switch__item--selected span")
+          .nth(1)
+          .textContent();
+      }
     } else {
       let elementExists2 = await page.locator("h1").count();
       if (elementExists2) {
@@ -113,8 +130,7 @@ module.exports = {
     }
 
     //prettier-ignore
-    const [episode, name, discriminator] = await Promise.all([
-      page.locator("css=li.multi-switch__item--selected span").nth(1).textContent(),
+    const [ name, discriminator] = await Promise.all([
       page.locator("css=span.trn-ign__username").first().textContent(),
       page.locator("css=span.trn-ign__discriminator").first().textContent().then((d) => d.slice(1)),
     ]);
