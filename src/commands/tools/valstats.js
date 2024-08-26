@@ -19,10 +19,14 @@ module.exports = {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
     }
-    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+    if (
+      config.botCommandsChannel &&
+      client.channels.cache.get(config.botCommandsChannel) !==
+        interaction.channel
+    ) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
@@ -44,6 +48,8 @@ module.exports = {
     let rankImgLink = "https://images.1v9.gg/unrankedfix-9535dccc99d8.webp";
     let mode;
     let embed;
+
+    await page.waitForTimeout(500);
 
     const elementExists = await page
       .locator("css=li.multi-switch__item--selected span")
