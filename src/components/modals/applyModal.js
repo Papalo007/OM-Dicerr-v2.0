@@ -1,5 +1,6 @@
 const Config = require("../../schemas/config");
 const App = require("../../schemas/application");
+const Link = require("../../schemas/link");
 const mongoose = require("mongoose");
 
 module.exports = {
@@ -10,11 +11,24 @@ module.exports = {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
     }
 
-    const tracker = interaction.fields.getTextInputValue("tracker");
+    let targetInHex;
+    const linkin = await Link.findOne({ userID: interaction.user.id });
+    if (linkin) {
+      targetInHex = linkin.riotID.replace(/#/g, "%23").replace(/ /g, "%20");
+    }
+
+    let tracker;
+    try {
+      tracker = interaction.fields.getTextInputValue("tracker");
+    } catch (error) {
+      tracker =
+        `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
+    }
+
     const valoRoles = interaction.fields.getTextInputValue("roles");
     const agents = interaction.fields.getTextInputValue("agents");
     const warmup = interaction.fields.getTextInputValue("warmup") ?? "N/A";
@@ -30,20 +44,6 @@ module.exports = {
       await interaction.editReply({
         content: `${tracker} is not a valid tracker link. Tracker links start with "https://tracker.gg/valorant/profile/riot/"`,
         ephemeral: true,
-      });
-      return;
-    }
-    if (
-      !valoRoles.toLowerCase().includes("duelist") &&
-      !valoRoles.toLowerCase().includes("control") &&
-      !valoRoles.toLowerCase().includes("ini") &&
-      !valoRoles.toLowerCase().includes("sen") &&
-      !valoRoles.toLowerCase().includes("all") &&
-      !valoRoles.toLowerCase().includes("every") &&
-      !valoRoles.toLowerCase().includes("flex")
-    ) {
-      await interaction.editReply({
-        content: `${valoRoles} is/are not a valid selection of Valorant roles`,
       });
       return;
     }

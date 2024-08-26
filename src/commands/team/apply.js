@@ -6,6 +6,7 @@ const {
   ModalBuilder,
 } = require("discord.js");
 const Config = require("../../schemas/config");
+const Link = require("../../schemas/link");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -16,10 +17,14 @@ module.exports = {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
     }
-    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+    if (
+      config.botCommandsChannel &&
+      client.channels.cache.get(config.botCommandsChannel) !==
+        interaction.channel
+    ) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
@@ -50,14 +55,16 @@ module.exports = {
     }
 
     //Building the modal action rows
+    const linkin = await Link.findOne({ userID: interaction.user.id });
+
     const modal = new ModalBuilder()
       .setCustomId(`application-modal`)
       .setTitle(`Application Details`);
 
     const trackerLink = new TextInputBuilder()
       .setCustomId(`tracker`)
-      .setLabel(`Enter the link to your valorant tracker`)
       .setRequired(true)
+      .setLabel(`Enter the link to your valorant tracker`)
       .setStyle(TextInputStyle.Short);
 
     const roleInput = new TextInputBuilder()
@@ -91,13 +98,23 @@ module.exports = {
     const fifthActionRow = new ActionRowBuilder().addComponents(extraNotes);
 
     //building the modal
-    modal.addComponents(
-      firstActionRow,
-      secondActionRow,
-      thirdActionRow,
-      fourthActionRow,
-      fifthActionRow
-    );
+
+    if (linkin) {
+      modal.addComponents(
+        secondActionRow,
+        thirdActionRow,
+        fourthActionRow,
+        fifthActionRow
+      );
+    } else {
+      modal.addComponents(
+        firstActionRow,
+        secondActionRow,
+        thirdActionRow,
+        fourthActionRow,
+        fifthActionRow
+      );
+    }
 
     //showing the modal
     await interaction.showModal(modal);

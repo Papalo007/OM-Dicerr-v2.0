@@ -102,7 +102,7 @@ module.exports = {
         .addFields(
           {
             name: "Tracker Link",
-            value: tracker,
+            value: `[${tracker}](${tracker})`,
             inline: false,
           },
           {
