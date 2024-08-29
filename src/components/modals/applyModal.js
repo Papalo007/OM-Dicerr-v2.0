@@ -40,9 +40,9 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
 
     //validation checks
-    if (!tracker.startsWith("https://tracker.gg/valorant/profile/riot/")) {
+    if (!tracker.includes("https://tracker.gg/valorant/profile/riot/")) {
       await interaction.editReply({
-        content: `${tracker} is not a valid tracker link. Tracker links start with "https://tracker.gg/valorant/profile/riot/"`,
+        content: `" ${tracker} " is not a valid tracker link. Tracker links start with "https://tracker.gg/valorant/profile/riot/"`,
         ephemeral: true,
       });
       return;
