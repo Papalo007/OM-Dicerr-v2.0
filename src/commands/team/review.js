@@ -8,6 +8,7 @@ const {
 const Config = require("../../schemas/config");
 const App = require("../../schemas/application");
 const Temp = require("../../schemas/temp");
+const Link = require("../../schemas/link");
 const mongoose = require("mongoose");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
@@ -65,7 +66,17 @@ module.exports = {
       return;
     }
 
-    const tracker = app.tracker;
+    let tracker;
+    const linkin = await Link.findOne({ userID: user.id });
+    if (linkin) {
+      const targetInHex = linkin.riotID
+        .replace(/#/g, "%23")
+        .replace(/ /g, "%20");
+      tracker = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
+    } else {
+      tracker = app.tracker;
+    }
+
     const roles = app.roles;
     const agents = app.agents;
     const warmup = app.warmup || "N/S";
