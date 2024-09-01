@@ -6,10 +6,13 @@ module.exports = {
     .setName("ping")
     .setDescription("Return my ping!")
     .setDMPermission(false),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
-    await interaction.reply({
+      await interaction.reply({
         content: `You haven't set up the proper channels yet! Do /config.`,
       });
       return;
@@ -17,7 +20,7 @@ module.exports = {
     if (config.botCommandsChannel) {
       const channel = client.channels.cache.get(config.botCommandsChannel);
       if (channel !== interaction.channel) {
-      await interaction.reply({
+        await interaction.reply({
           content: `You cannot use commands in this channel`,
           ephemeral: true,
         });

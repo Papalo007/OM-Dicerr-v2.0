@@ -32,6 +32,9 @@ module.exports = {
           "Past which messages should be deleted (in the format of 1s, 1m, 1h, 1d) Max 7 days"
         )
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const logChannel = client.channels.cache.get("1219986404889722932");
     const { options, guild } = interaction;

@@ -13,6 +13,9 @@ module.exports = {
   data: {
     name: "recruit-button",
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     await interaction.deferReply();
 
@@ -125,7 +128,7 @@ module.exports = {
 
           if (announcementChannel) {
             await announcementChannel.send({
-              content: `<@&1245743215898919143> <@${user}> has been recruited to Typhoon!`, 
+              content: `<@&1245743215898919143> <@${user}> has been recruited to Typhoon!`,
             });
           }
 

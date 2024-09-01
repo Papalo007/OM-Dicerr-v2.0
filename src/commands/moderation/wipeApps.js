@@ -15,14 +15,21 @@ module.exports = {
     .setDescription("Deletes all applications.")
     .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
     }
-    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+    if (
+      config.botCommandsChannel &&
+      client.channels.cache.get(config.botCommandsChannel) !==
+        interaction.channel
+    ) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,

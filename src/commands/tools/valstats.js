@@ -18,6 +18,9 @@ module.exports = {
         .setDescription("The member whose statistics you want.")
         .setRequired(false)
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {

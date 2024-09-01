@@ -15,6 +15,9 @@ module.exports = {
         .setDescription("The riot id of the user (Username#ID)")
         .setRequired(true)
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {

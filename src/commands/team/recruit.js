@@ -1,8 +1,4 @@
-const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  DiscordAPIError,
-} = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const Config = require("../../schemas/config");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
@@ -24,14 +20,21 @@ module.exports = {
         .setDescription("The team you want the member to recruit to.")
         .setRequired(true)
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
     }
-    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+    if (
+      config.botCommandsChannel &&
+      client.channels.cache.get(config.botCommandsChannel) !==
+        interaction.channel
+    ) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
@@ -69,7 +72,10 @@ module.exports = {
         content: `${team} is not a valid team. Valid options are: One More, OM, Typhoon, TPN (Case doesn't matter).`,
       });
       return;
-    } else if (team.toLowerCase() === "one more" || team.toLowerCase() === "om") {
+    } else if (
+      team.toLowerCase() === "one more" ||
+      team.toLowerCase() === "om"
+    ) {
       if (user.roles.cache.some((role) => role.name === "OM Roster")) {
         await interaction.editReply({
           content: `This player is already in One More.`,
@@ -111,7 +117,10 @@ module.exports = {
         }
       }
       team = "One More";
-    } else if (team.toLowerCase() === "tpn" || team.toLowerCase() === "typhoon") {
+    } else if (
+      team.toLowerCase() === "tpn" ||
+      team.toLowerCase() === "typhoon"
+    ) {
       if (user.roles.cache.some((role) => role.name === "OM Roster")) {
         await interaction.editReply({
           content: `This player is already in One More.`,

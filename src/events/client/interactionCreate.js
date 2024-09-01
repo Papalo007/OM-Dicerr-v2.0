@@ -2,6 +2,9 @@ const { InteractionType } = require("discord.js");
 
 module.exports = {
   name: "interactionCreate",
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     if (interaction.isChatInputCommand()) {
       const { commands } = client;
@@ -32,7 +35,6 @@ module.exports = {
                 ephemeral: true,
               });
             }
-
           }
         }
       } else {

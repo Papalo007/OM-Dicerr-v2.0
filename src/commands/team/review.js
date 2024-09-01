@@ -24,6 +24,9 @@ module.exports = {
         .setDescription("The member whose application you'd like to review.")
         .setRequired(true)
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     await interaction.deferReply();
     const config = await Config.findOne({ guildID: interaction.guild.id });

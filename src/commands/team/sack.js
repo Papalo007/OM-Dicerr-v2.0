@@ -18,14 +18,21 @@ module.exports = {
         .setDescription("The team that the member is currenty in.")
         .setRequired(true)
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /config.`
+        content: `You haven't set up the proper channels yet! Do /config.`,
       });
     }
-    if (config.botCommandsChannel && client.channels.cache.get(config.botCommandsChannel) !== interaction.channel) {
+    if (
+      config.botCommandsChannel &&
+      client.channels.cache.get(config.botCommandsChannel) !==
+        interaction.channel
+    ) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
@@ -56,7 +63,10 @@ module.exports = {
         content: `${team} is not a valid team. Valid options are: One More, OM, Typhoon, TPN (Case doesn't matter).`,
       });
       return;
-    } else if (team.toLowerCase() === "one more" || team.toLowerCase() === "om") {
+    } else if (
+      team.toLowerCase() === "one more" ||
+      team.toLowerCase() === "om"
+    ) {
       if (!user.roles.cache.some((role) => role.name === "OM Roster")) {
         await interaction.editReply({
           content: `This player is not in One More.`,

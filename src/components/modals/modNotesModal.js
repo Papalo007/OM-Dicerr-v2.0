@@ -9,6 +9,9 @@ module.exports = {
   data: {
     name: `mod-notes-modal`,
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     const tempDoc = await Temp.findOne({ tempValueOne: "app-review" });
@@ -24,7 +27,7 @@ module.exports = {
     const user = tempDoc.tempValueTwo;
     let modNotes = interaction.fields.getTextInputValue("modNotes");
     const app = await App.findOne({ userID: user });
-    const existingNotes = app.moderatorNotes || ' ';
+    const existingNotes = app.moderatorNotes || " ";
 
     let date_time = new Date();
 

@@ -11,6 +11,9 @@ module.exports = {
   data: {
     name: "del-warn-button",
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const tempDoc = await Temp.findOne({ tempValueOne: "delete-warning" });
     if (!tempDoc) {

@@ -1,13 +1,16 @@
 const { PermissionFlagsBits } = require("discord.js");
 const Config = require("../../schemas/config");
 const { MongoClient } = require("mongodb");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { databaseToken } = process.env;
 
 module.exports = {
   data: {
     name: `config-modal`,
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const mongoClient = new MongoClient(databaseToken);
 
@@ -23,7 +26,9 @@ module.exports = {
     if (
       !interaction.member.permissions.has(PermissionFlagsBits.Administrator)
     ) {
-    await interaction.reply({ content: `You do not have Admin permissions.` });
+      await interaction.reply({
+        content: `You do not have Admin permissions.`,
+      });
       return;
     }
 
@@ -42,7 +47,7 @@ module.exports = {
 
       if (invite.guild.id === interaction.guild.id) {
       } else {
-      await interaction.reply({
+        await interaction.reply({
           content: `This is not an invite for this server.`,
         });
         logChannelID = null;
@@ -54,7 +59,7 @@ module.exports = {
     }
 
     if (interaction.guild.channels.cache.get(logChannelID) === undefined) {
-    await interaction.reply({
+      await interaction.reply({
         content: `The provided channel ID for the log channel does not correspond to an existing channel in this server.`,
       });
       logChannelID = null;
@@ -66,7 +71,7 @@ module.exports = {
       interaction.guild.channels.cache.get(botCommandChannelID) === undefined &&
       botCommandChannelID
     ) {
-    await interaction.reply({
+      await interaction.reply({
         content: `The provided channel ID for the bot-commands channel does not correspond to an existing channel in this server.`,
       });
       logChannelID = null;
@@ -78,7 +83,7 @@ module.exports = {
       interaction.guild.channels.cache.get(rosChangeChanID) === undefined &&
       rosChangeChanID
     ) {
-    await interaction.reply({
+      await interaction.reply({
         content: `The provided channel ID for the roster changes channel does not correspond to an existing channel in this server.`,
       });
       logChannelID = null;
@@ -88,19 +93,19 @@ module.exports = {
       return;
     } else {
       if (botCommandChannelID && rosChangeChanID) {
-      await interaction.reply({
+        await interaction.reply({
           content: `The log channel, bot-commands channel and roster-changes channel have been set to <#${logChannelID}>, <#${botCommandChannelID}> and <#${rosChangeChanID}> respectively. The permanent invite for this server is ${permaInvite}`,
         });
       } else if (botCommandChannelID) {
-      await interaction.reply({
+        await interaction.reply({
           content: `The log channel has been set to <#${logChannelID}> and the bot-commands channel has been set to <#${botCommandChannelID}>. The permanent invite for this server is ${permaInvite}`,
         });
       } else if (rosChangeChanID) {
-      await interaction.reply({
+        await interaction.reply({
           content: `The log channel has been set to <#${logChannelID}> and the roster-changes channel has been set to <#${rosChangeChanID}>. The permanent invite for this server is ${permaInvite}`,
         });
       } else {
-      await interaction.reply({
+        await interaction.reply({
           content: `The log channel has been set to <#${logChannelID}> and the permanent invite for this server is ${permaInvite}`,
         });
       }

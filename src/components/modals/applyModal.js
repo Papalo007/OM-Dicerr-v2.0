@@ -7,6 +7,9 @@ module.exports = {
   data: {
     name: `application-modal`,
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
@@ -25,8 +28,7 @@ module.exports = {
     try {
       tracker = interaction.fields.getTextInputValue("tracker");
     } catch (error) {
-      tracker =
-        `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
+      tracker = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
     }
 
     const valoRoles = interaction.fields.getTextInputValue("roles");

@@ -13,6 +13,9 @@ module.exports = {
         .setMaxValue(100)
         .setRequired(true)
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     if (
       !interaction.member.permissions.has(

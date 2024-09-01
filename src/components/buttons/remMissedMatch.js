@@ -8,6 +8,9 @@ module.exports = {
   data: {
     name: "rem-missed-match-button",
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     const tempDoc = await Temp.findOne({ tempValueOne: "app-review" });
     if (!tempDoc) {

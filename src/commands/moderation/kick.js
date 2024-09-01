@@ -22,9 +22,10 @@ module.exports = {
         .setName("reason")
         .setDescription("The reason for kicking the member.")
     ),
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
-    
-
     await interaction.deferReply({ ephemeral: true });
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {

@@ -8,6 +8,9 @@ module.exports = {
   data: {
     name: `del-warn-menu`,
   },
+  /**
+   * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   */
   async execute(interaction, client) {
     await interaction.deferReply();
     const dateReason = interaction.values[0];
@@ -20,8 +23,10 @@ module.exports = {
       return;
     }
 
-    const warn = await Warning.findOne({ reason: dateReason.substring(10), date: dateReason.substring(0, 10) });
-
+    const warn = await Warning.findOne({
+      reason: dateReason.substring(10),
+      date: dateReason.substring(0, 10),
+    });
 
     if (!warn) {
       await interaction.editReply({
@@ -52,7 +57,10 @@ module.exports = {
 
     const myDB = mongoClient.db("test");
     const warnColl = myDB.collection("warnings");
-    const query = { reason: dateReason.substring(10), date: dateReason.substring(0, 10) };
+    const query = {
+      reason: dateReason.substring(10),
+      date: dateReason.substring(0, 10),
+    };
 
     const response = await interaction.editReply({
       content: `Are you sure you want to remove the warning from ${warn.date} with the reason: ${warn.reason}`,
