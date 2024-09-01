@@ -1,22 +1,19 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const Config = require("../../schemas/config");
-const Link = require("../../schemas/link");
 const { chromium } = require("playwright-extra");
 const stealth = require("puppeteer-extra-plugin-stealth")();
 chromium.use(stealth);
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName("valstats")
-    .setDescription(
-      "Returns the statistics of the provided Discord user in Valorant."
-    )
+    .setName("valstats-id")
+    .setDescription("Returns the statistics of the provided user in Valorant.")
     .setDMPermission(false)
-    .addUserOption((option) =>
+    .addStringOption((option) =>
       option
-        .setName("user")
-        .setDescription("The member whose statistics you want.")
-        .setRequired(false)
+        .setName("target")
+        .setDescription("The riot id of the user (Username#ID)")
+        .setRequired(true)
     ),
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
@@ -37,21 +34,8 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const user = interaction.options.getUser("user") || interaction.user;
-    const linkin = await Link.findOne({ userID: user.id });
-    if (!linkin) {
-      return await interaction.editReply({
-        content: `This user hasn't linked their valorant account.`,
-      });
-    }
-    if (linkin.status === "private") {
-      return await interaction.editReply({
-        content: `This user's valorant account is private.`,
-      });
-    }
-
-    const target = linkin.riotID;
-    const targetInHex = target.replace(/#/g, "%23");
+    const target = interaction.options.getString("target");
+    const targetInHex = target.replace(/#/g, "%23").replace(/ /g, "%20");
     const trackerLink = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
 
     const browser = await chromium.launch();
@@ -91,40 +75,14 @@ module.exports = {
           .locator("css=li.multi-switch__item--selected span")
           .nth(1)
           .textContent();
+
+        if (mode === "Premier") {
+          await page.getByText("Competitive").first().click();
+          checkForErrors(target, page, interaction);
+        }
       }
     } else {
-      let elementExists2 = await page.locator("h1").count();
-      if (elementExists2) {
-        let elements = await page.locator("h1").textContent();
-        if (elements === "404") {
-          await interaction.editReply({
-            content: `404\nCouldn't find the player "${target}"`,
-            ephemeral: true,
-          });
-          return;
-        } else if (elements === "tracker.gg") {
-          await interaction.editReply({
-            content: `The bot couldn't get past the human verification check.`,
-            ephemeral: true,
-          });
-          return;
-        } else if (elements.toLowerCase() === "bad request") {
-          await interaction.editReply({
-            content: `Bad Request.`,
-            ephemeral: false,
-          });
-          return;
-        } else {
-          await interaction.editReply({
-            content: `An unknown error occurred while trying to gather information about this player. Please check the bot terminal for further information.`,
-          });
-          console.log("An unknown error occurred");
-        }
-      } else {
-        await interaction.editReply({
-          content: `An unknown error occurred. Please create a support ticket with a screenshot of this error message.\ntarget=${target}`,
-        });
-      }
+      checkForErrors(target, page, interaction);
     }
 
     if (mode === "Competitive") {
@@ -267,3 +225,42 @@ module.exports = {
     });
   },
 };
+
+async function checkForErrors(target, page, interaction) {
+  let elementExists2 = await page.locator("h1").count();
+  if (elementExists2) {
+    let elements = await page.locator("h1").textContent();
+    if (elements === "404") {
+      return await interaction.editReply({
+        content: `404\nCouldn't find the player "${target}"`,
+        ephemeral: true,
+      });
+    } else if (elements === "tracker.gg") {
+      return await interaction.editReply({
+        content: `The bot couldn't get past the human verification check.`,
+        ephemeral: true,
+      });
+    } else if (elements.toLowerCase() === "bad request") {
+      return await interaction.editReply({
+        content: `Bad Request.`,
+        ephemeral: false,
+      });
+    } else {
+      console.log("An unknown error occurred");
+      return await interaction.editReply({
+        content: `An unknown error occurred while trying to gather information about this player. Please check the bot terminal for further information.`,
+      });
+    }
+  } else {
+    let elements = await page.locator("css=span.font-light").textContent();
+    if (elements.toLowerCase().includes("profile is private")) {
+      return await interaction.editReply({
+        content: `${target}'s profile is private, so I cannot access any information regarding this player :(`,
+      });
+    } else {
+      return await interaction.editReply({
+        content: `An unknown error occurred. Please create a support ticket with a screenshot of this error message.\ntarget=${target}`,
+      });
+    }
+  }
+}

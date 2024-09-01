@@ -40,9 +40,9 @@ module.exports = {
 
     await interaction.deferReply();
 
-    const linkedRole = interaction.guild.roles.cache.get('1277671443454230568');
+    const linkedRole = interaction.guild.roles.cache.get("1277671443454230568");
     const target = interaction.options.getString("riotid");
-    const targetInHex = target.replace(/#/g, "%23");
+    const targetInHex = target.replace(/#/g, "%23").replace(/ /g, "%20");
     const trackerLink = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
     const mongoClient = new MongoClient(databaseToken);
     let status;
@@ -61,6 +61,8 @@ module.exports = {
       .nth(0)
       .count();
     let elements = await page.locator("css=span.font-light").count();
+    let mode;
+    let errorCheck;
 
     if (elements) {
       elements = await page.locator("css=span.font-light").textContent();
@@ -83,7 +85,22 @@ module.exports = {
         .first()
         .textContent()
         .then((d) => d.slice(1));
-      status = "public";
+      nameNdiscrim = name + discriminator;
+      mode = await page
+        .locator("css=li.multi-switch__item--selected span")
+        .nth(0)
+        .textContent();
+      if (mode === "Premier") {
+        await page.getByText("Competitive").first().click();
+        errorCheck = page.getByText(nameNdiscrim + "'S PROFILE IS PRIVATE.");
+        if (errorCheck) {
+          status = "private";
+        } else {
+          status = "public";
+        }
+      } else {
+        status = "public";
+      }
     } else {
       const error = await page.locator("h1").textContent();
       if (error === "404") {
@@ -119,9 +136,10 @@ module.exports = {
       //Replying
       if (status === "private") {
         await interaction.editReply({
-          content: `Your discord account has been updated and is now linked with the valorant account **${nameNdiscrim}**.` +
-          `\nWARNING! Your tracker account is private, so we cannot access any information regarding your statistics.` +
-          `\nPlease make it public by visiting ${trackerLink} and signing in to claim your account.`,
+          content:
+            `Your discord account has been updated and is now linked with the valorant account **${nameNdiscrim}**.` +
+            `\nWARNING! Your tracker account is private, so we cannot access any information regarding your statistics.` +
+            `\nPlease make it public by visiting ${trackerLink} and signing in to claim your account.`,
         });
       } else if (status === "public") {
         await interaction.editReply({
@@ -140,9 +158,10 @@ module.exports = {
       //Replying
       if (status === "private") {
         await interaction.editReply({
-          content: `Your discord account has been linked with the valorant account **${nameNdiscrim}**.` +
-          `\nWARNING! Your tracker account is private, so we cannot access any information regarding your statistics.` +
-          `\nPlease make it public by visiting ${trackerLink} and signing in to claim your account.`,
+          content:
+            `Your discord account has been linked with the valorant account **${nameNdiscrim}**.` +
+            `\nWARNING! Your tracker account is private, so we cannot access any information regarding your statistics.` +
+            `\nPlease make it public by visiting ${trackerLink} and signing in to claim your account.`,
         });
       } else if (status === "public") {
         await interaction.editReply({
