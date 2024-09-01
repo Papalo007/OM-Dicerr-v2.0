@@ -1,4 +1,2 @@
 TODO: For /review, create a config where all roles with permission to review are stored in an array.
 TODO: Make the setup process easier by having the end user simply reply or send messages in a channel (Make the code and then apply for the Message_Content PGI in discord's developer portal)
-TODO: /valstats and /link command don't work properly when "No data found"
-TODO: /valstats and /link don't realise a profile is private when premier stats exist (premier stats are public by default) so it should *click* the competitive tab
