@@ -9,12 +9,9 @@ const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildModeration,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.DirectMessages,
-    GatewayIntentBits.DirectMessageReactions,
-    GatewayIntentBits.GuildScheduledEvents,
-    GatewayIntentBits.GuildMessagePolls,
-    GatewayIntentBits.DirectMessagePolls,
+    //Privileged
+    GatewayIntentBits.MessageContent,
   ],
 });
 client.commands = new Collection();
