@@ -69,7 +69,7 @@ module.exports = {
     try {
       const confirmation = await response.awaitMessageComponent({
         filter: collectorFilter,
-        time: 30_000,
+        time: 2 * 60_000,
       });
 
       if (confirmation.customId === "confirm") {

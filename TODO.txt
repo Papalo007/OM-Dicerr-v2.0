@@ -1,3 +1,4 @@
 TODO: For /review, create a config where all roles with permission to review are stored in an array.
 TODO: Make the setup process easier by having the end user simply reply or send messages in a channel
 TODO: Make a suggestion command (for users to suggest something)
+TODO: Make a purge after command like dyno: https://discord.com/developers/docs/resources/message#get-channel-messages

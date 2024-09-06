@@ -30,19 +30,18 @@ module.exports = {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       await interaction.editReply({
-        content: `You haven't set up the proper channels yet! Do /config.`,
+        content: `You haven't set up the proper channels yet! Do /setup.`,
       });
       return;
     }
-    if (config.botCommandsChannel) {
-      const channel = client.channels.cache.get(config.botCommandsChannel);
-      if (channel !== interaction.channel) {
-        await interaction.editReply({
-          content: `You cannot use commands in this channel`,
-          ephemeral: true,
-        });
-        return;
-      }
+    if (
+      config.botCommandsChannel &&
+      !botCommandsChannel.includes(interaction.channel.id)
+    ) {
+      return interaction.editReply({
+        content: `You cannot use commands in this channel`,
+        ephemeral: true,
+      });
     }
 
     const user = interaction.options.getUser("target");

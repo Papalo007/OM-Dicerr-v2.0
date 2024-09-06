@@ -32,7 +32,7 @@ module.exports = {
     const config = await Config.findOne({ guildID: interaction.guild.id });
     if (!config) {
       await interaction.editReply({
-        content: `You haven't set up the proper channels yet! Do /config.`,
+        content: `You haven't set up the proper channels yet! Do /setup.`,
       });
       return;
     }

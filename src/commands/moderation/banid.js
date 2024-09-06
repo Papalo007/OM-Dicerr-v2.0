@@ -36,18 +36,37 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const logChannel = client.channels.cache.get("1219986404889722932");
-    const { options, guild } = interaction;
+    const config = await Config.findOne({ guildID: interaction.guild.id });
+    if (!config) {
+      return interaction.reply({
+        content: `You haven't set up the proper channels yet! Do /setup.`,
+      });
+    }
+    if (
+      config.botCommandsChannel &&
+      !botCommandsChannel.includes(interaction.channel.id)
+    ) {
+      return interaction.reply({
+        content: `You cannot use commands in this channel`,
+        ephemeral: true,
+      });
+    }
 
-    const userId = await options.getString("target");
-    const reason = (await options.getString("reason")) ?? "N/A";
+    const logChannel = client.channels.cache.get("1219986404889722932");
+
+    const userId = interaction.options.getString("target");
+    const reason = interaction.options.getString("reason") ?? "N/A";
     let purgeTime = interaction.options.getString("purgetime") ?? "0s";
     let dmuser = "true";
     let validPurgeTime = true;
 
     await interaction.deferReply({ ephemeral: true });
 
-    if (!guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+    if (
+      !interaction.guild.members.me.permissions.has(
+        PermissionFlagsBits.BanMembers
+      )
+    ) {
       return interaction.editReply({
         content: `Invalid Permissions. I need to have the Ban Members permission in order to ban members :(`,
       });
@@ -112,7 +131,11 @@ module.exports = {
     }
     if (!validPurgeTime) return;
 
-    if (!guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+    if (
+      !interaction.guild.members.me.permissions.has(
+        PermissionFlagsBits.BanMembers
+      )
+    ) {
       return interaction.editReply({
         content: `Invalid Permissions. I need to have the Ban Members permission in order to ban members :(`,
       });
@@ -123,7 +146,7 @@ module.exports = {
     }
 
     try {
-      await guild.bans.fetch(userId);
+      await interaction.guild.bans.fetch(userId);
       return interaction.editReply({
         content: `<@${userId}> is already banned`,
       });
@@ -188,7 +211,7 @@ module.exports = {
 
       //embed
 
-      await guild.members.ban(userId).catch(console.error);
+      await interaction.guild.members.ban(userId).catch(console.error);
       await interaction.editReply({
         content: `**<@${userId}>** has been banned succesfully. Reason: ${reason}`,
       });
