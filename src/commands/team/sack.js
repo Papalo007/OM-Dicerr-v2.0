@@ -28,7 +28,7 @@ module.exports = {
         content: `You haven't set up the proper channels yet! Do /setup.`,
       });
     }
-    if(config.botCommandsChannel && !botCommandsChannel.includes(interaction.channel.id)) {
+    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
@@ -39,13 +39,13 @@ module.exports = {
 
     const targetUser = interaction.options.getUser("target");
     const user = interaction.options.getMember("target");
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const userId = targetUser.id;
     const member = interaction.member;
     const omRole = interaction.guild.roles.cache.get("1219879616546738236");
     const tmRole = interaction.guild.roles.cache.get("1243214533590384660");
     const announcementChannel = client.channels.cache.get(
-      config.rosterChangesChannelID
+      config.rosterChangesChannel
     );
 
     let team = interaction.options.getString("team");

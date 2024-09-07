@@ -33,14 +33,14 @@ module.exports = {
         content: `You haven't set up the proper channels yet! Do /setup.`,
       });
     }
-    if(config.botCommandsChannel && !botCommandsChannel.includes(interaction.channel.id)) {
+    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
       })
     }
 
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const { options, guild } = interaction;
     const userId = await options.getString("target");
     const reason = (await options.getString("reason")) ?? "N/A";

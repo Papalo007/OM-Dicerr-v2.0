@@ -38,7 +38,7 @@ module.exports = {
         content: `You haven't set up the proper channels yet! Do /setup.`,
       });
     }
-    if(config.botCommandsChannel && !botCommandsChannel.includes(interaction.channel.id)) {
+    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,
@@ -61,7 +61,7 @@ module.exports = {
     const targetUser = interaction.options.getUser("target");
     const reason = interaction.options.getString("reason") || "N/S";
     let dmUser = interaction.options.getString("message") || "yes";
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
 
     await interaction.deferReply({ ephemeral: true });
 

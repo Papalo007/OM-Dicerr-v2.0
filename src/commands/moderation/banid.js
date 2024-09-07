@@ -44,7 +44,7 @@ module.exports = {
     }
     if (
       config.botCommandsChannel &&
-      !botCommandsChannel.includes(interaction.channel.id)
+      !config.botCommandsChannel.includes(interaction.channel.id)
     ) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,

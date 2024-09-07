@@ -17,7 +17,7 @@ module.exports = {
       });
       return;
     }
-    if(config.botCommandsChannel && !botCommandsChannel.includes(interaction.channel.id)) {
+    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,

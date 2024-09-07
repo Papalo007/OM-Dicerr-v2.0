@@ -25,7 +25,7 @@ module.exports = {
         content: `You haven't set up the proper channels yet! Do /setup.`,
       });
     }
-    if(config.botCommandsChannel && !botCommandsChannel.includes(interaction.channel.id)) {
+    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
       return interaction.reply({
         content: `You cannot use commands in this channel`,
         ephemeral: true,

@@ -21,7 +21,7 @@ module.exports = {
       return;
     }
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const user = tempDoc.tempValueTwo;
     const interactionUser = tempDoc.tempValueThree;
     const app = await App.findOne({ userID: user });

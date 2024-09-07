@@ -21,10 +21,10 @@ module.exports = {
       return;
     }
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const user = tempDoc.tempValueTwo;
     const interactionUser = tempDoc.tempValueThree;
-    const appRole = interaction.guild.roles.cache.get("1257734734168068147");
+    const appRole = interaction.guild.roles.cache.get(config.applicantRole);
     const member = await interaction.guild.members.fetch(user);
 
     if (interaction.user.id !== interactionUser) {

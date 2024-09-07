@@ -36,7 +36,7 @@ module.exports = {
     }
     if (
       config.botCommandsChannel &&
-      !botCommandsChannel.includes(interaction.channel.id)
+      !config.botCommandsChannel.includes(interaction.channel.id)
     ) {
       return interaction.editReply({
         content: `You cannot use commands in this channel`,
@@ -52,7 +52,7 @@ module.exports = {
       .catch(console.error);
 
     if (!reason) reason = "N/A.";
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
 
     if (
       !interaction.guild.members.me.permissions.has(
