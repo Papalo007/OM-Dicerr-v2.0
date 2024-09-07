@@ -50,7 +50,7 @@ module.exports = {
     const user = interaction.options.getUser("target");
     const reason = interaction.options.getString("reason") ?? "N/A";
     const guild = interaction.guild;
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     let purgeTime = interaction.options.getString("purgetime") ?? "0s";
     let dmuser = "true";
 

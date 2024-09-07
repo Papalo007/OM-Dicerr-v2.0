@@ -23,7 +23,7 @@ module.exports = {
       return;
     }
 
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const user = tempDoc.tempValueTwo;
     let modNotes = interaction.fields.getTextInputValue("modNotes");
     const app = await App.findOne({ userID: user });

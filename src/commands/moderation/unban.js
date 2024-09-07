@@ -40,7 +40,7 @@ module.exports = {
       })
     }
 
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const { options, guild } = interaction;
     const userId = await options.getString("target");
     const reason = (await options.getString("reason")) ?? "N/A";

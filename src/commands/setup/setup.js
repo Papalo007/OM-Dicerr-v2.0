@@ -3,6 +3,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ActionRowBuilder,
+  PermissionFlagsBits,
 } = require("discord.js");
 const Config = require("../../schemas/config");
 const mongoose = require("mongoose");
@@ -13,6 +14,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("setup")
     .setDescription("Setup the bot!")
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .setDMPermission(false),
 
   /**
@@ -399,7 +401,10 @@ function checkValid(answer, index, interaction, answers) {
         answer.toLowerCase().includes("none") ||
         interaction.guild.channels.cache.get(answer)
       ) {
-        if (interaction.guild.channels.cache.get(answer).type === 0 ||interaction.guild.channels.cache.get(answer).type === 5) {
+        if (
+          interaction.guild.channels.cache.get(answer).type === 0 ||
+          interaction.guild.channels.cache.get(answer).type === 5
+        ) {
           return true;
         } else {
           return false;
@@ -426,7 +431,10 @@ function checkValid(answer, index, interaction, answers) {
       }
     case 7:
       if (interaction.guild.channels.cache.get(answer)) {
-        if (interaction.guild.channels.cache.get(answer).type === 0 || interaction.guild.channels.cache.get(answer).type === 5) {
+        if (
+          interaction.guild.channels.cache.get(answer).type === 0 ||
+          interaction.guild.channels.cache.get(answer).type === 5
+        ) {
           return true;
         } else {
           return false;
@@ -442,7 +450,10 @@ function checkValid(answer, index, interaction, answers) {
         const splitStrings = answer.split(",").map((str) => str.trim());
         for (chanid of splitStrings) {
           try {
-            if (interaction.guild.channels.cache.get(chanid).type !== 0 && interaction.guild.channels.cache.get(answer).type !== 5) {
+            if (
+              interaction.guild.channels.cache.get(chanid).type !== 0 &&
+              interaction.guild.channels.cache.get(answer).type !== 5
+            ) {
               return false;
             }
           } catch (error) {
@@ -453,7 +464,10 @@ function checkValid(answer, index, interaction, answers) {
         return true;
       } else {
         if (interaction.guild.channels.cache.get(answer)) {
-          if (interaction.guild.channels.cache.get(answer).type === 0 || interaction.guild.channels.cache.get(answer).type === 5) {
+          if (
+            interaction.guild.channels.cache.get(answer).type === 0 ||
+            interaction.guild.channels.cache.get(answer).type === 5
+          ) {
             return true;
           } else {
             return false;

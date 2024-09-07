@@ -28,10 +28,10 @@ module.exports = {
       return;
     }
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const user = tempDoc.tempValueTwo;
     const interactionUser = tempDoc.tempValueThree;
-    const appRole = interaction.guild.roles.cache.get("1257734734168068147");
+    const appRole = interaction.guild.roles.cache.get(config.applicantRole);
     const omRole = interaction.guild.roles.cache.get("1219879616546738236");
     const tmRole = interaction.guild.roles.cache.get("1243214533590384660");
     const member = await interaction.guild.members.fetch(user);
@@ -52,7 +52,7 @@ module.exports = {
     }
 
     const announcementChannel = client.channels.cache.get(
-      config.rosterChangesChannelID
+      config.rosterChangesChannel
     );
 
     const omButton = new ButtonBuilder()

@@ -33,7 +33,7 @@ module.exports = {
     }
 
     await interaction.deferReply();
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
 
     const confirmButton = new ButtonBuilder()
       .setCustomId("confirm")

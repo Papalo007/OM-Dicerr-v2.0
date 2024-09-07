@@ -61,7 +61,7 @@ module.exports = {
     const targetUser = interaction.options.getUser("target");
     const reason = interaction.options.getString("reason") || "N/S";
     let dmUser = interaction.options.getString("message") || "yes";
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
 
     await interaction.deferReply({ ephemeral: true });
 

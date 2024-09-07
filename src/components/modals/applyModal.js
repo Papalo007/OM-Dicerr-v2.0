@@ -35,8 +35,8 @@ module.exports = {
     const agents = interaction.fields.getTextInputValue("agents");
     const warmup = interaction.fields.getTextInputValue("warmup") ?? "N/A";
     const notes = interaction.fields.getTextInputValue("notes") ?? "N/A";
-    const appRole = interaction.guild.roles.cache.get("1257734734168068147");
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const appRole = interaction.guild.roles.cache.get(config.applicantRole);
+    const logChannel = client.channels.cache.get(config.logChannel);
     const member = interaction.member;
 
     await interaction.deferReply({ ephemeral: true });

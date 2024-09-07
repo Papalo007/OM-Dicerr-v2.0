@@ -52,7 +52,7 @@ module.exports = {
       .catch(console.error);
 
     if (!reason) reason = "N/A.";
-    const logChannel = client.channels.cache.get(config.logChannelID);
+    const logChannel = client.channels.cache.get(config.logChannel);
 
     if (
       !interaction.guild.members.me.permissions.has(
