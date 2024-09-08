@@ -26,12 +26,13 @@ module.exports = {
 If at any point you want to go to the previous question to answer it again, send the message "Back". With this you can change your answer in a previous question. After 20 minutes, the program will exit if the setup process is not done.`,
     });
 
-    let done;
+    let done = false;
 
     const questions = [
       "Do you want to enable the Teams module? Answer with Yes or No.",
       "Please enter the team's name, along with their short codes (One More -> OM). If there are multiple teams, use the following format: Team1 name Team1-short-code, Team2 name Team2-short-code etc. (e.g. One More OM, Typhoon TPN, Two More TM)",
       "What is the ID of the Team's manager role? (right click the role -> Copy Role ID) A team manager can recruit and kick players from the team's roster. If there are multiple teams, seperate the IDs using a comma (The order should be the same as the one you used in the previous step).",
+      'What is the ID of the Team Roster/Player role? (the players who are *in* the team). If there are multiple, seperate them using a comma and make sure the order is the same as the order you inputted your Teams. If you don\'t want one, reply with "None".',
       "Which roles (send the role ID of them) should be able to review someone's application? These can add notes, delete, add missed matches and remove missed matches from the application, but only the team manager roles can recruit someone.",
       "What is the ID of the Roster-Changes channel? This is the channel where changes in a team's roster will be announced. (if you don't want to add one, send the message \"None\".",
       'What is the Role ID of the applicant role? (Whoever applies will get that role). If you don\'t want one, reply with "None" (I, the Bot, recommend you add an applicant role as it is easier to see who has applied).',
@@ -85,25 +86,26 @@ If at any point you want to go to the previous question to answer it again, send
         message.reply(
           'This is the first question. You can\'t go back. If you want to cancel setup, say "exit".'
         );
-        interaction.channel.send(`${questions[index]} ${index + 1}/9`);
+        interaction.channel.send(`${questions[index]} ${index + 1}/10`);
         return;
-      } else if (index === 6 && answers[0].toLowerCase() === "no") {
+      } else if (index === 7 && answers[0].toLowerCase() === "no") {
         index = 1;
       }
       answers.pop();
       index--;
-      await interaction.channel.send(`${questions[index]} ${index + 1}/9`);
+      await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
     });
 
-    await interaction.channel.send(`${questions[index]} ${index + 1}/9`);
+    if (done === false)
+      await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
     answerCollector.on("collect", async (answer) => {
       if (checkValid(answer.content, index, interaction, answers)) {
         if (index === 0 && answer.content.toLowerCase() === "no") {
-          index = 5;
+          index = 6;
         }
         index++;
         answers.push(answer.content);
-        if (index === 9) {
+        if (index === 10) {
           done = true;
           const confirmButton = new ButtonBuilder()
             .setCustomId("confirm")
@@ -125,15 +127,21 @@ If at any point you want to go to the previous question to answer it again, send
           const existingConfig = await Config.findOne({
             guildID: interaction.guild.id,
           });
+
+          if (answers[3].toLowerCase().includes("none")) answers[3] = null;
+          if (answers[9].toLowerCase().includes("none")) answers[8] = null;
+          if (answers[5].toLowerCase().includes("none")) answers[4] = null;
+          if (answers[6].toLowerCase().includes("none")) answers[5] = null;
+
           switch (answers.length) {
             case 4:
+              const botCommandsChannels4 = answers[3]
+                ? answers[3].split(",").map((str) => str.trim())
+                : answers[3];
               const staffRoles4 = answers[1]
                 .split(",")
                 .map((str) => str.trim());
               const logChan4 = answers[2];
-              const botCommandsChannels4 = answers[3]
-                .split(",")
-                .map((str) => str.trim());
 
               summary = "Team Module: Disabled\nStaff roles: ";
               for (roleid of staffRoles4) {
@@ -144,12 +152,13 @@ If at any point you want to go to the previous question to answer it again, send
               summary =
                 summary +
                 `\nLogs Channel: <#${logChan4}>\nCommands enabled in the following channels: `;
-              for (channelID of botCommandsChannels4) {
-                if (channelID.toLowerCase() === "none") {
-                  summary = summary + "All";
-                } else {
+
+              if (botCommandsChannels4) {
+                for (channelID of botCommandsChannels4) {
                   summary = summary + `<#${channelID}>, `;
                 }
+              } else {
+                summary = summary + "All.";
               }
 
               const response = await interaction.channel.send({
@@ -183,8 +192,9 @@ If at any point you want to go to the previous question to answer it again, send
                     },
                   };
                   await coll.updateOne(filter, updateConfig);
-                  await interaction.followUp("Configuration profile updated!");
-                  return;
+                  return await interaction.followUp(
+                    "Configuration profile updated!"
+                  );
                 } else {
                   const smallConfig = new Config({
                     _id: new mongoose.Types.ObjectId(),
@@ -196,8 +206,9 @@ If at any point you want to go to the previous question to answer it again, send
                   });
 
                   await smallConfig.save().catch(console.error);
-                  await interaction.followUp("Configuration profile saved!");
-                  return;
+                  return await interaction.followUp(
+                    "Configuration profile saved!"
+                  );
                 }
               } else if (confirmationCollector.customId === "cancel") {
                 await confirmationCollector.update({
@@ -208,11 +219,14 @@ If at any point you want to go to the previous question to answer it again, send
               }
 
             case 9:
-              const staffRoles = answers[6].split(",").map((str) => str.trim());
-              const logChan = answers[7];
-              const botCommandsChannels = answers[8]
-                .split(",")
-                .map((str) => str.trim());
+              const rosterRoles = answers[3]
+                ? answers[3].split(",").map((str) => str.trim())
+                : answers[3];
+              const botCommandsChannels = answers[9]
+                ? answers[9].split(",").map((str) => str.trim())
+                : answers[9];
+              const staffRoles = answers[7].split(",").map((str) => str.trim());
+              const logChan = answers[6];
 
               const teamsAndShortCodes = answers[1]
                 .split(",")
@@ -226,9 +240,9 @@ If at any point you want to go to the previous question to answer it again, send
               const teamManagerRoles = answers[2]
                 .split(",")
                 .map((str) => str.trim());
-              const scoutRoles = answers[3].split(",").map((str) => str.trim());
-              const rosChangesChannel = answers[4];
-              const appRole = answers[5];
+              const scoutRoles = answers[4].split(",").map((str) => str.trim());
+              const rosChangesChannel = answers[5];
+              const appRole = answers[6];
 
               //Summary
 
@@ -246,27 +260,46 @@ If at any point you want to go to the previous question to answer it again, send
                   summary +
                   `<@& this is so no ping remove this hehe ping blocker ${roleid}>, `;
               }
+              summary = summary + "\nTeam Roster roles (order is the same): ";
+              if (rosterRoles) {
+                for (roleid of rosterRoles) {
+                  summary = summary + `<@& ping blocker ${roleid}>, `;
+                }
+              } else {
+                summary = summary + "N/A";
+              }
               summary =
                 summary +
                 `\nScout Roles (roles that can review applications): `;
               for (scoutrole of scoutRoles) {
                 summary = summary + `<@& ping blocker ${scoutrole}>, `;
               }
-              summary =
-                summary +
-                `\nRoster Chages Channel: <#${rosChangesChannel}>\nApplicant Role: <@& ping blocker ${appRole}>\nStaff Roles: `;
+              summary = summary + `\nRoster Chages Channel: `;
+              if (rosChangesChannel) {
+                summary = summary + `<#${rosChangesChannel}>`;
+              } else {
+                summary = summary + "N/A.";
+              }
+              summary = summary + `\nApplicant Role: `;
+              if (appRole) {
+                `<@& ping blocker ${appRole}>`;
+              } else {
+                summary = summary + "N/A.";
+              }
+              summary = summary + `\nStaff Roles: `;
               for (role of staffRoles) {
                 summary = summary + `<@& ping blocker ${role}>, `;
               }
               summary =
                 summary +
                 `\nLog Channel: <#${logChan}>\nCommands enabled in the following channels: `;
-              for (channelID of botCommandsChannels) {
-                if (channelID.toLowerCase() === "none") {
-                  summary = summary + "All";
-                } else {
+
+              if (botCommandsChannels) {
+                for (channelID of botCommandsChannels) {
                   summary = summary + `<#${channelID}>, `;
                 }
+              } else {
+                summary = summary + "All.";
               }
 
               //summary done
@@ -299,6 +332,7 @@ If at any point you want to go to the previous question to answer it again, send
                       teams: teams,
                       teamShortCodes: shortCodes,
                       teamManagerRoles: teamManagerRoles,
+                      teamRosterRoles: rosterRoles,
                       scoutRoles: scoutRoles,
                       rosterChangesChannel: rosChangesChannel,
                       applicantRole: appRole,
@@ -308,8 +342,9 @@ If at any point you want to go to the previous question to answer it again, send
                     },
                   };
                   await coll.updateOne(filter, updateConfig);
-                  await interaction.followUp("Configuration profile updated!");
-                  return;
+                  return await interaction.followUp(
+                    "Configuration profile updated!"
+                  );
                 } else {
                   const config = new Config({
                     _id: new mongoose.Types.ObjectId(),
@@ -318,6 +353,7 @@ If at any point you want to go to the previous question to answer it again, send
                     teams: teams,
                     teamShortCodes: shortCodes,
                     teamManagerRoles: teamManagerRoles,
+                    teamRosterRoles: rosterRoles,
                     scoutRoles: scoutRoles,
                     rosterChangesChannel: rosChangesChannel,
                     applicantRole: appRole,
@@ -326,6 +362,9 @@ If at any point you want to go to the previous question to answer it again, send
                     botCommandsChannel: botCommandsChannels,
                   });
                   config.save().catch(console.error);
+                  return await interaction.followUp(
+                    "Configuration profile updated!"
+                  );
                 }
               } else if (confirmationCollector2.customId === "cancel") {
                 await confirmationCollector2.update({
@@ -334,14 +373,12 @@ If at any point you want to go to the previous question to answer it again, send
                 });
                 return;
               }
-
-            //TODO: Look for a config with the same guildID in the db and if there is, update it.
           }
         }
-        interaction.channel.send(`${questions[index]} ${index + 1}/9`);
+        interaction.channel.send(`${questions[index]} ${index + 1}/10`);
       } else {
         answer.reply("That is not a valid answer.\n");
-        interaction.channel.send(`${questions[index]} ${index + 1}/9`);
+        interaction.channel.send(`${questions[index]} ${index + 1}/10`);
       }
     });
 
@@ -393,10 +430,24 @@ function checkValid(answer, index, interaction, answers) {
           }
         }
         return true;
+      } else if (answer.includes("none")) {
+        return true;
       } else {
         return interaction.guild.roles.cache.get(answer) ? true : false;
       }
     case 4:
+      if (answer.includes(",")) {
+        const splitStrings = answer.split(",").map((str) => str.trim());
+        for (roleid of splitStrings) {
+          if (!interaction.guild.roles.cache.get(roleid)) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return interaction.guild.roles.cache.get(answer) ? true : false;
+      }
+    case 5:
       if (
         answer.toLowerCase().includes("none") ||
         interaction.guild.channels.cache.get(answer)
@@ -412,12 +463,12 @@ function checkValid(answer, index, interaction, answers) {
       } else {
         return false;
       }
-    case 5:
+    case 6:
       return answer.toLowerCase().includes("none") ||
         interaction.guild.roles.cache.get(answer)
         ? true
         : false;
-    case 6:
+    case 7:
       if (answer.includes(",")) {
         const splitStrings = answer.split(",").map((str) => str.trim());
         for (roleid of splitStrings) {
@@ -429,7 +480,7 @@ function checkValid(answer, index, interaction, answers) {
       } else {
         return interaction.guild.roles.cache.get(answer) ? true : false;
       }
-    case 7:
+    case 8:
       if (interaction.guild.channels.cache.get(answer)) {
         if (
           interaction.guild.channels.cache.get(answer).type === 0 ||
@@ -442,7 +493,7 @@ function checkValid(answer, index, interaction, answers) {
       } else {
         return false;
       }
-    case 8:
+    case 9:
       if (answer.toLowerCase() === "none") {
         return true;
       }

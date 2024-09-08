@@ -6,6 +6,7 @@ const configSchema = new Schema({
   teams: { type: Array, required: false },
   teamShortCodes: { type: Array, required: false },
   teamManagerRoles: { type: Array, required: false },
+  teamRosterRoles: { type: Array, required: false },
   scoutRoles: { type: Array, required: false },
   rosterChangesChannel: { type: String, required: false },
   applicantRole: { type: String, required: false },

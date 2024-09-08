@@ -1,4 +1,5 @@
 const { InteractionType } = require("discord.js");
+const Config = require("../../schemas/config");
 
 module.exports = {
   name: "interactionCreate",
@@ -14,6 +15,26 @@ module.exports = {
 
       if (interaction.isRepliable()) {
         try {
+          if (command.data.name !== "setup") {
+            const serverConfig = await Config.findOne({
+              guildID: interaction.guild.id,
+            });
+            if (!serverConfig) {
+              return await interaction.reply({
+                content: `You haven't set up the proper channels yet! Do /setup.`,
+                ephemeral: true,
+              });
+            }
+            if (
+              serverConfig.botCommandsChannel &&
+              !serverConfig.botCommandsChannel.includes(interaction.channelId)
+            ) {
+              return await interaction.reply({
+                content: `You cannot use commands in this channel!`,
+                ephemeral: true,
+              });
+            }
+          }
           await command.execute(interaction, client);
         } catch (error) {
           console.error(error);
