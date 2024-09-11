@@ -248,6 +248,7 @@ module.exports = {
 
     const temp = await new Temp({
       _id: new mongoose.Types.ObjectId(),
+      guildID: interaction.guild.id,
       tempValueOne: "app-review",
       tempValueTwo: user.id,
       tempValueThree: interaction.user.id,
@@ -257,7 +258,7 @@ module.exports = {
     setTimeout(() => {
       const myDB = mongoClient.db("test");
       const myColl = myDB.collection("temp");
-      const query = { tempValueOne: "app-review" };
+      const query = { tempValueOne: "app-review", guildID: interaction.guild.id };
       myColl.deleteOne(query);
       missedMatchButton.setDisabled(true);
       removeMissedMatchButton.setDisabled(true);

@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const applicationSchema = new Schema({
   _id: Schema.Types.ObjectId,
+  guildID: String,
   userID: String,
   tracker: String,
   roles: String,

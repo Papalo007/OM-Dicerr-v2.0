@@ -30,7 +30,7 @@ If at any point you want to go to the previous question to answer it again, send
 
     const questions = [
       "Do you want to enable the Teams module? Answer with Yes or No.",
-      "Please enter the team's name, along with their short codes (One More -> OM). If there are multiple teams, use the following format: Team1 name Team1-short-code, Team2 name Team2-short-code etc. (e.g. One More OM, Typhoon TPN, Two More TM)",
+      "Please enter the team's name, along with their short codes (One More -> OM). If there are multiple teams, use the following format: Team1 name Team1-short-code, Team2 name Team2-short-code etc. (e.g. One More OM, Typhoon TPN, Two More TM). Up to 5 times per server are supported at the moment.",
       "What is the ID of the Team's manager role? (right click the role -> Copy Role ID) A team manager can recruit and kick players from the team's roster. If there are multiple teams, seperate the IDs using a comma (The order should be the same as the one you used in the previous step).",
       'What is the ID of the Team Roster/Player role? (the players who are *in* the team). If there are multiple, seperate them using a comma and make sure the order is the same as the order you inputted your Teams. If you don\'t want one, reply with "None".',
       "Which roles (send the role ID of them) should be able to review someone's application? These can add notes, delete, add missed matches and remove missed matches from the application, but only the team manager roles can recruit someone.",
@@ -401,6 +401,9 @@ function checkValid(answer, index, interaction, answers) {
     case 1:
       if (answer.includes(",")) {
         const splitStrings = answer.split(",").map((str) => str.trim());
+        if (splitStrings.length > 5) {
+          return false;
+        }
         return splitStrings.every((str) => str.includes(" "));
       } else {
         return answer.includes(" ");

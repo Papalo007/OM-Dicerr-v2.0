@@ -99,6 +99,7 @@ module.exports = {
 
       const temp = await new Temp({
         _id: new mongoose.Types.ObjectId(),
+        guildID: interaction.guild.id,
         tempValueOne: "delete-warning",
         tempValueTwo: user.id,
         tempValueThree: interaction.user.id,
@@ -108,7 +109,7 @@ module.exports = {
       setTimeout(() => {
         const testDB = mongoClient.db("test");
         const tempColl = testDB.collection("temp");
-        const query = { tempValueOne: "delete-warning" };
+        const query = { tempValueOne: "delete-warning", guildID: interaction.guild.id };
         tempColl.deleteOne(query);
         deleteWarn.setDisabled(true);
         if (interaction.user !== user) {

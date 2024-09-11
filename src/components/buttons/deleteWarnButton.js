@@ -15,7 +15,10 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const tempDoc = await Temp.findOne({ tempValueOne: "delete-warning" });
+    const tempDoc = await Temp.findOne({
+      tempValueOne: "delete-warning",
+      guildID: interaction.guild.id,
+    });
     if (!tempDoc) {
       await interaction.reply({
         content: `The buttons have been disabled. Please run /warnings again.`,

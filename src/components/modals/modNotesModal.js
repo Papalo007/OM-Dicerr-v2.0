@@ -14,7 +14,7 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    const tempDoc = await Temp.findOne({ tempValueOne: "app-review" });
+    const tempDoc = await Temp.findOne({ tempValueOne: "app-review", guildID: interaction.guild.id });
     if (!tempDoc) {
       await interaction.reply({
         content: `The buttons have been disabled. Please run /review again.`,

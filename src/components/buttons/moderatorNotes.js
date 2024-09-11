@@ -14,7 +14,7 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const tempDoc = await Temp.findOne({ tempValueOne: "app-review" });
+    const tempDoc = await Temp.findOne({ tempValueOne: "app-review", guildID: interaction.guild.id });
     if (!tempDoc) {
       await interaction.reply({
         content: `The buttons have been disabled. Please run /review again.`,

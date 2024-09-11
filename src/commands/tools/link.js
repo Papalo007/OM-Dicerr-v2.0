@@ -24,7 +24,6 @@ module.exports = {
   async execute(interaction, client) {
     await interaction.deferReply();
 
-    const linkedRole = interaction.guild.roles.cache.get("1277671443454230568");
     const target = interaction.options.getString("riotid");
     const targetInHex = target.replace(/#/g, "%23").replace(/ /g, "%20");
     const trackerLink = `https://tracker.gg/valorant/profile/riot/${targetInHex}/overview`;
@@ -116,7 +115,6 @@ module.exports = {
         },
       };
       await coll.updateOne(filter, updateDocument);
-      await interaction.member.roles.add(linkedRole).catch(console.error);
       //Replying
       if (status === "private") {
         await interaction.editReply({
@@ -138,7 +136,6 @@ module.exports = {
         status: status,
       });
       await linkin.save().catch(console.error);
-      await interaction.member.roles.add(linkedRole).catch(console.error);
       //Replying
       if (status === "private") {
         await interaction.editReply({

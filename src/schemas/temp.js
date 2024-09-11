@@ -1,6 +1,7 @@
 const { Schema, model } = require("mongoose");
 const tempSchema = new Schema({
   _id: Schema.Types.ObjectId,
+  guildID: String,
   tempValueOne: { type: String, required: false },
   tempValueTwo: { type: String, required: false },
   tempValueThree: { type: String, required: false },

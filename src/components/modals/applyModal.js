@@ -60,6 +60,7 @@ module.exports = {
 
     const application = new App({
       _id: new mongoose.Types.ObjectId(),
+      guildID: interaction.guild.id,
       userID: interaction.user.id,
       tracker: tracker,
       roles: valoRoles,

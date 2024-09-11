@@ -43,6 +43,7 @@ module.exports = {
       config.rosterChangesChannel
     );
     let teamIndex;
+    let done;
     let team = interaction.options.getString("team");
 
     for (let i = 0; i < config.teams.length; i++) {
