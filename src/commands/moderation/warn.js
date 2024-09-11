@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const Config = require("../../schemas/config");
 const Warning = require("../../schemas/warn");
 const mongoose = require("mongoose");
+const Config = require("../../schemas/config");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -33,30 +33,18 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
+    let done = false;
+    for (roleid of config.staffRoles) {
+      if (interaction.member.roles.cache.some((role) => role.id === roleid)) {
+        done = true;
+        break;
+      }
     }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
-
-    if (
-      !interaction.member.roles.cache.some((role) => role.name === "Staff") &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "Team Manager"
-      )
-    ) {
-      await interaction.reply({
+    if (!done)
+      return await interaction.reply({
         content: `You do not have permission to use this command.`,
         ephemeral: true,
       });
-      return;
-    }
 
     const targetUser = interaction.options.getUser("target");
     const reason = interaction.options.getString("reason") || "N/S";

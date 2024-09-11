@@ -26,23 +26,9 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    await interaction.deferReply({ ephemeral: true });
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      await interaction.editReply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-      return;
-    }
-    if (
-      config.botCommandsChannel &&
-      !config.botCommandsChannel.includes(interaction.channel.id)
-    ) {
-      return interaction.editReply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      });
-    }
+
+    await interaction.deferReply({ ephemeral: true });
 
     const user = interaction.options.getUser("target");
     let dmuser = "false";

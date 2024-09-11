@@ -1,5 +1,4 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const Config = require("../../schemas/config");
 const Link = require("../../schemas/link");
 const { chromium } = require("playwright-extra");
 const stealth = require("puppeteer-extra-plugin-stealth")();
@@ -22,19 +21,6 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
-
     await interaction.deferReply();
     const user = interaction.options.getUser("user") || interaction.user;
     const linkin = await Link.findOne({ userID: user.id });

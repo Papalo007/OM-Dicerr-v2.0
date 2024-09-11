@@ -5,10 +5,10 @@ const {
   ButtonStyle,
   ActionRowBuilder,
 } = require("discord.js");
-const Config = require("../../schemas/config");
 const Temp = require("../../schemas/temp");
 const { databaseToken } = process.env;
 const { MongoClient } = require("mongodb");
+const Config = require("../../schemas/config");
 const mongoose = require("mongoose");
 
 module.exports = {
@@ -26,31 +26,17 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
+    const config = await Config.findOne({ guildID: interaction.guildId });
+    for (roleid of config.staffRoles) {
+      if (interaction.member.roles.some((role) => role.id === roleid)) {
+        return;
+      }
 
-
-    if (
-      !interaction.member.roles.cache.some((role) => role.name === "Staff") &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "Team Manager"
-      ) &&
-      !interaction.user !== interaction.options.getUser("target")
-    ) {
-      await interaction.reply({
-        content: `You do not have permission to use this command.`,
-        ephemeral: true,
-      });
+      if (interaction.user !== interaction.options.getUser("target"))
+        await interaction.reply({
+          content: `You do not have permission to use this command.`,
+          ephemeral: true,
+        });
       return;
     }
     await interaction.deferReply();

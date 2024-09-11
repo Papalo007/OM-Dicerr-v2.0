@@ -1,5 +1,4 @@
 const { SlashCommandBuilder } = require("discord.js");
-const Config = require("../../schemas/config");
 const Link = require("../../schemas/link");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
@@ -23,20 +22,6 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      await interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-      return;
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
-
     await interaction.deferReply();
 
     const linkedRole = interaction.guild.roles.cache.get("1277671443454230568");

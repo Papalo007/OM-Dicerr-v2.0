@@ -23,99 +23,68 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
+    let done = false;
+    let teamIndex;
 
     await interaction.deferReply({ ephemeral: true });
 
     const targetUser = interaction.options.getUser("target");
     const user = interaction.options.getMember("target");
-    const logChannel = client.channels.cache.get(config.logChannel);
+    const logChannel = interaction.guild.channels.cache.get(config.logChannel);
     const userId = targetUser.id;
     const member = interaction.member;
-    const omRole = interaction.guild.roles.cache.get("1219879616546738236");
-    const tmRole = interaction.guild.roles.cache.get("1243214533590384660");
-    const announcementChannel = client.channels.cache.get(
+    const announcementChannel = interaction.guild.channels.cache.get(
       config.rosterChangesChannel
     );
 
     let team = interaction.options.getString("team");
-    if (
-      team.toLowerCase() !== "one more" &&
-      team.toLowerCase() !== "typhoon" &&
-      team.toLowerCase() !== "om" &&
-      team.toLowerCase() !== "tpn"
-    ) {
-      await interaction.editReply({
-        content: `${team} is not a valid team. Valid options are: One More, OM, Typhoon, TPN (Case doesn't matter).`,
+
+    for (let i = 0; i < config.teams.length; i++) {
+      if (
+        team.toLowerCase() === config.teams[i] ||
+        team.toLowerCase() === config.teamShortCodes[i]
+      ) {
+        done = true;
+        team = config.teams[i];
+        teamIndex = i;
+        break;
+      }
+    }
+
+    if (!done) {
+      return await interaction.editReply({
+        content: `${team} is not a valid team. Valid options are the team names and short codes that were inputted during setup.`,
       });
-      return;
-    } else if (
-      team.toLowerCase() === "one more" ||
-      team.toLowerCase() === "om"
-    ) {
-      if (!user.roles.cache.some((role) => role.name === "OM Roster")) {
-        await interaction.editReply({
-          content: `This player is not in One More.`,
+    } else {
+      if (
+        !user.roles.cache.some(
+          (role) => role.id === config.teamRosterRoles[teamIndex]
+        )
+      ) {
+        return await interaction.editReply({
+          content: `This player is not in ${team}.`,
           ephemeral: true,
         });
-        return;
       } else if (
-        !member.roles.cache.some((role) => role.name === "OM Manager")
+        !member.roles.cache.some(
+          (role) => role.id === config.teamManagerRoles[teamIndex]
+        )
       ) {
-        await interaction.editReply({
-          content: `You are not authorised to kick people from One More.`,
+        return await interaction.editReply({
+          content: `You are not authorised to kick people from ${team}.`,
         });
-        return;
       }
-      await user.roles.remove(omRole).catch(console.error);
+      await user.roles.remove(interaction.guild.roles.cache.get(config.teamRosterRoles[teamIndex])).catch(console.error);
 
       if (announcementChannel) {
         await announcementChannel.send({
-          content: `<@&1245743215898919143> <@${userId}> has been removed from One More's roster.`,
+          content: `<@${userId}> has been removed from One More's roster.`,
         });
       }
 
       await targetUser.send({
-        content: `Unfortunately, you have been kicked from One More, however, you can still apply for a position in Typhoon. To do that, run the /apply command and notify a TPN Manager, that you are looking to join the team.`,
+        content: `Unfortunately, you have been kicked from ${team}, however, you can most likely still apply for a position in a team at a later time. If a spot opens up, apply using the /apply command.`,
       });
-      team = "One More";
-    } else if (team.toLowerCase() === "typhoon" || team === "tpn") {
-      if (!user.roles.cache.some((role) => role.name === "TPN Roster")) {
-        await interaction.editReply({
-          content: `This player is not in Typhoon.`,
-          ephemeral: true,
-        });
-        return;
-      } else if (
-        !member.roles.cache.some((role) => role.name === "TPN Manager")
-      ) {
-        await interaction.editReply({
-          content: `You are not authorised to kick people from Typhoon.`,
-        });
-        return;
-      }
-      await user.roles.remove(tmRole).catch(console.error);
-
-      if (announcementChannel) {
-        await announcementChannel.send({
-          content: `<@&1245743215898919143> <@${userId}> has been removed from Typhoon's roster.`,
-        });
-      }
-
-      await targetUser.send({
-        content: `You have been kicked from Typhoon.`,
-      });
-      team = "Typhoon";
     }
 
     const logEmbed = new EmbedBuilder()

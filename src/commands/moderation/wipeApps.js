@@ -5,9 +5,9 @@ const {
   ActionRowBuilder,
   PermissionFlagsBits,
 } = require("discord.js");
-const Config = require("../../schemas/config");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
+const Config = require("../../schemas/config");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -20,18 +20,6 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
-
     await interaction.deferReply();
     const logChannel = client.channels.cache.get(config.logChannel);
 

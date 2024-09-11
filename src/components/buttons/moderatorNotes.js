@@ -5,7 +5,6 @@ const {
   TextInputStyle,
 } = require("discord.js");
 const Temp = require("../../schemas/temp");
-const Config = require("../../schemas/config");
 
 module.exports = {
   data: {

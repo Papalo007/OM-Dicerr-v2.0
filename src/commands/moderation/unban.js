@@ -28,17 +28,6 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
 
     const logChannel = client.channels.cache.get(config.logChannel);
     const { options, guild } = interaction;

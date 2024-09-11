@@ -35,17 +35,6 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
 
     const user = interaction.options.getUser("target");
     const reason = interaction.options.getString("reason") ?? "N/A";
@@ -129,7 +118,7 @@ module.exports = {
       try {
         await client.users.send(
           user.id,
-          `You have been banned from ${interaction.guild.name}\nReason: ${reason}\nIf you get unbanned, this is a permanent server invite: ${config.permaInvite}`
+          `You have been banned from ${interaction.guild.name}\nReason: ${reason}`
         );
       } catch (error) {
         dmuser = "false";

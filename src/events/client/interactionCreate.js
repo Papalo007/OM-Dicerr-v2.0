@@ -15,7 +15,7 @@ module.exports = {
 
       if (interaction.isRepliable()) {
         try {
-          if (command.data.name !== "setup") {
+          if (command.data.name !== "setup" && command.data.name !== "purge") {
             const serverConfig = await Config.findOne({
               guildID: interaction.guild.id,
             });

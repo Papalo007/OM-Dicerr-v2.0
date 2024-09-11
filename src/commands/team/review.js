@@ -5,10 +5,10 @@ const {
   ButtonStyle,
   ButtonBuilder,
 } = require("discord.js");
-const Config = require("../../schemas/config");
 const App = require("../../schemas/application");
 const Temp = require("../../schemas/temp");
 const Link = require("../../schemas/link");
+const Config = require("../../schemas/config");
 const mongoose = require("mongoose");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
@@ -28,37 +28,27 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
+    let done = false;
     await interaction.deferReply();
+
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      await interaction.editReply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-      return;
-    }
 
     const mongoClient = new MongoClient(databaseToken);
 
     const user = interaction.options.getUser("target");
 
-    if (
-      interaction.user !== user &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "TPN Manager"
-      ) &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "OM Manager"
-      ) &&
-      !interaction.member.roles.cache.some((role) => role.name === "Staff") &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "Team Manager"
-      )
-    ) {
-      await interaction.editReply({
-        content: `You are not authorised to view applications other than your own.`,
-        ephemeral: true,
-      });
-      return;
+    if (interaction.user !== user) {
+      for (roleid of config.scoutRoles) {
+        if (interaction.member.roles.cache.some((role) => role.id === roleid)) {
+          done = true;
+          break;
+        }
+      }
+      if (!done)
+        return await interaction.editReply({
+          content: `You are not authorised to view applications other than your own.`,
+          ephemeral: true,
+        });
     }
 
     const app = await App.findOne({ userID: user.id });
@@ -93,19 +83,39 @@ module.exports = {
 
     const warnings = await warnColl.countDocuments(query);
 
-    if (
-      interaction.user === user &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "TPN Manager"
-      ) &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "OM Manager"
-      ) &&
-      !interaction.member.roles.cache.some((role) => role.name === "Staff") &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "Team Manager"
-      )
-    ) {
+    for (roleid of config.scoutRoles) {
+      if (interaction.member.roles.cache.some((role) => role.id === roleid)) {
+        done = true;
+        break;
+      } else {
+        done = false;
+      }
+    }
+    const missedMatchButton = new ButtonBuilder()
+      .setCustomId("missed-match-button")
+      .setLabel("Add a missed match")
+      .setStyle(ButtonStyle.Primary);
+
+    const removeMissedMatchButton = new ButtonBuilder()
+      .setCustomId("rem-missed-match-button")
+      .setLabel("Remove a missed match")
+      .setStyle(ButtonStyle.Danger);
+
+    const moderatorNotesButton = new ButtonBuilder()
+      .setCustomId("mod-notes-button")
+      .setLabel("Add notes")
+      .setStyle(ButtonStyle.Primary);
+
+    const recruitButton = new ButtonBuilder()
+      .setCustomId("recruit-button")
+      .setLabel("Recruit")
+      .setStyle(ButtonStyle.Success);
+
+    const deleteApplication = new ButtonBuilder()
+      .setCustomId("del-app-button")
+      .setLabel("Delete Application")
+      .setStyle(ButtonStyle.Danger);
+    if (interaction.user === user && !done) {
       embed = new EmbedBuilder()
         .setAuthor({
           name: "Moderator Dicerr",
@@ -156,6 +166,14 @@ module.exports = {
           iconURL: user.displayAvatarURL(),
         })
         .setTimestamp();
+
+      const firstActionRow = new ActionRowBuilder().addComponents(
+        deleteApplication
+      );
+      await interaction.editReply({
+        embeds: [embed],
+        components: [firstActionRow],
+      });
     } else {
       embed = new EmbedBuilder()
         .setAuthor({
@@ -212,53 +230,7 @@ module.exports = {
           iconURL: user.displayAvatarURL(),
         })
         .setTimestamp();
-    }
-    const missedMatchButton = new ButtonBuilder()
-      .setCustomId("missed-match-button")
-      .setLabel("Add a missed match")
-      .setStyle(ButtonStyle.Primary);
 
-    const removeMissedMatchButton = new ButtonBuilder()
-      .setCustomId("rem-missed-match-button")
-      .setLabel("Remove a missed match")
-      .setStyle(ButtonStyle.Danger);
-
-    const moderatorNotesButton = new ButtonBuilder()
-      .setCustomId("mod-notes-button")
-      .setLabel("Add notes")
-      .setStyle(ButtonStyle.Primary);
-
-    const recruitButton = new ButtonBuilder()
-      .setCustomId("recruit-button")
-      .setLabel("Recruit")
-      .setStyle(ButtonStyle.Success);
-
-    const deleteApplication = new ButtonBuilder()
-      .setCustomId("del-app-button")
-      .setLabel("Delete Application")
-      .setStyle(ButtonStyle.Danger);
-
-    if (
-      interaction.user === user &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "TPN Manager"
-      ) &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "OM Manager"
-      ) &&
-      !interaction.member.roles.cache.some((role) => role.name === "Staff") &&
-      !interaction.member.roles.cache.some(
-        (role) => role.name === "Team Manager"
-      )
-    ) {
-      const firstActionRow = new ActionRowBuilder().addComponents(
-        deleteApplication
-      );
-      await interaction.editReply({
-        embeds: [embed],
-        components: [firstActionRow],
-      });
-    } else {
       const firstActionRow = new ActionRowBuilder().addComponents(
         moderatorNotesButton,
         recruitButton,
@@ -292,19 +264,7 @@ module.exports = {
       moderatorNotesButton.setDisabled(true);
       recruitButton.setDisabled(true);
       deleteApplication.setDisabled(true);
-      if (
-        interaction.user === user &&
-        !interaction.member.roles.cache.some(
-          (role) => role.name === "TPN Manager"
-        ) &&
-        !interaction.member.roles.cache.some(
-          (role) => role.name === "OM Manager"
-        ) &&
-        !interaction.member.roles.cache.some((role) => role.name === "Staff") &&
-        !interaction.member.roles.cache.some(
-          (role) => role.name === "Team Manager"
-        )
-      ) {
+      if (interaction.user === user && !done) {
         const firstActionRow = new ActionRowBuilder().addComponents(
           deleteApplication
         );

@@ -5,8 +5,8 @@ const {
   ActionRowBuilder,
   ModalBuilder,
 } = require("discord.js");
-const Config = require("../../schemas/config");
 const Link = require("../../schemas/link");
+const Config = require("../../schemas/config");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -17,41 +17,31 @@ module.exports = {
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */
   async execute(interaction, client) {
-    const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
-
+    const config = await Config.findOne({ guildID: interaction.guildId });
+    let done = false;
     if (
-      interaction.member.roles.cache.some((role) => role.name === "Applicant")
+      interaction.member.roles.cache.some(
+        (role) => role.id === config.applicantRole
+      )
     ) {
-      await interaction.reply({
+      return await interaction.reply({
         content: `You have already submitted an application. To review or withdraw your application, use /review`,
         ephemeral: true,
       });
-      return;
     }
 
-    if (
-      interaction.member.roles.cache.some(
-        (role) => role.name === "OM Roster"
-      ) ||
-      interaction.member.roles.cache.some((role) => role.name === "TPN Roster")
-    ) {
+    for (roleid of config.teamRosterRoles) {
+      if (interaction.member.roles.some((role) => role.id === roleid)) {
+        return;
+      }
       await interaction.reply({
-        content: `You are already in a team.`,
+        content: `You are already in a team!`,
         ephemeral: true,
       });
-      return;
+      done = true;
     }
+
+    if (done) return;
 
     //Building the modal action rows
     const linkin = await Link.findOne({ userID: interaction.user.id });

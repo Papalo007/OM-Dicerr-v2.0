@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const Config = require("../../schemas/config");
 const { MongoClient } = require("mongodb");
 const { databaseToken } = process.env;
+const Config = require("../../schemas/config");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -25,18 +25,6 @@ module.exports = {
    */
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guild.id });
-    if (!config) {
-      return interaction.reply({
-        content: `You haven't set up the proper channels yet! Do /setup.`,
-      });
-    }
-    if(config.botCommandsChannel && !config.botCommandsChannel.includes(interaction.channel.id)) {
-      return interaction.reply({
-        content: `You cannot use commands in this channel`,
-        ephemeral: true,
-      })
-    }
-
     await interaction.deferReply();
 
     const targetUser = interaction.options.getUser("target");
@@ -44,8 +32,6 @@ module.exports = {
     const logChannel = client.channels.cache.get(config.logChannel);
     const userId = targetUser.id;
     const member = interaction.member;
-    const omRole = interaction.guild.roles.cache.get("1219879616546738236");
-    const tmRole = interaction.guild.roles.cache.get("1243214533590384660");
     const appRole = interaction.guild.roles.cache.get(config.applicantRole);
     const mongoClient = new MongoClient(databaseToken);
 
@@ -56,52 +42,48 @@ module.exports = {
     const announcementChannel = client.channels.cache.get(
       config.rosterChangesChannel
     );
-
+    let teamIndex;
     let team = interaction.options.getString("team");
-    if (
-      team.toLowerCase() !== "one more" &&
-      team.toLowerCase() !== "typhoon" &&
-      team.toLowerCase() !== "om" &&
-      team.toLowerCase() !== "tpn"
-    ) {
-      await interaction.editReply({
-        content: `${team} is not a valid team. Valid options are: One More, OM, Typhoon, TPN (Case doesn't matter).`,
+
+    for (let i = 0; i < config.teams.length; i++) {
+      if (
+        team.toLowerCase() === config.teams[i] ||
+        team.toLowerCase() === config.teamShortCodes[i]
+      ) {
+        done = true;
+        team = config.teams[i];
+        teamIndex = i;
+        break;
+      }
+    }
+
+    if (!done) {
+      return await interaction.editReply({
+        content: `${team} is not a valid team. Valid options are the team names and short codes that were inputted during setup.`,
       });
-      return;
-    } else if (
-      team.toLowerCase() === "one more" ||
-      team.toLowerCase() === "om"
-    ) {
-      if (user.roles.cache.some((role) => role.name === "OM Roster")) {
-        await interaction.editReply({
-          content: `This player is already in One More.`,
+    } else {
+      if (user.roles.cache.some((role) => role.id === config.teamRosterRoles[teamIndex])) {
+        return await interaction.editReply({
+          content: `This player is already in ${team}.`,
           ephemeral: true,
         });
-        return;
-      } else if (user.roles.cache.some((role) => role.name === "TPN Roster")) {
-        await interaction.editReply({
-          content: `This player is already in Typhoon.`,
-          ephemeral: true,
-        });
-        return;
       }
-      if (!member.roles.cache.some((role) => role.name === "OM Manager")) {
-        await interaction.editReply({
-          content: `You are not authorised to recruit people for One More.`,
+      if (!member.roles.cache.some((role) => role.id === config.teamManagerRoles[teamIndex])) {
+        return await interaction.editReply({
+          content: `You are not authorised to recruit people for ${team}.`,
         });
-        return;
       } else {
-        await user.roles.add(omRole).catch(console.error);
+        await user.roles.add(interaction.guild.roles.cache.get(config.teamRosterRoles[teamIndex])).catch(console.error);
         await user.roles.remove(appRole).catch(console.error);
 
         if (announcementChannel) {
           await announcementChannel.send({
-            content: `<@&1245743215898919143> <@${userId}> has been recruited to One More!`,
+            content: `<@&1245743215898919143> <@${userId}> has been recruited to ${team}!`,
           });
         }
         try {
           await targetUser.send({
-            content: `Congratulations, you have been recruited to One More!\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM Papalo or Herbs and ask for an invite to the OM server. I can't do that myself :(`,
+            content: `Congratulations, you have been recruited to One More!`,
           });
         } catch (error) {
           console.log(error);
@@ -112,52 +94,6 @@ module.exports = {
           }
         }
       }
-      team = "One More";
-    } else if (
-      team.toLowerCase() === "tpn" ||
-      team.toLowerCase() === "typhoon"
-    ) {
-      if (user.roles.cache.some((role) => role.name === "OM Roster")) {
-        await interaction.editReply({
-          content: `This player is already in One More.`,
-          ephemeral: true,
-        });
-        return;
-      } else if (user.roles.cache.some((role) => role.name === "TPN Roster")) {
-        await interaction.editReply({
-          content: `This player is already in Typhoon.`,
-          ephemeral: true,
-        });
-        return;
-      }
-      if (!member.roles.cache.some((role) => role.name === "TPN Manager")) {
-        await interaction.editReply({
-          content: `You are not authorised to recruit people for Typhoon.`,
-        });
-        return;
-      } else {
-        await user.roles.add(tmRole).catch(console.error);
-        await user.roles.remove(appRole).catch(console.error);
-
-        if (announcementChannel) {
-          await announcementChannel.send({
-            content: `<@&1245743215898919143> <@${userId}> has been recruited to Typhoon!`,
-          });
-        }
-        try {
-          await targetUser.send({
-            content: `Congratulations, you have been recruited to Typhoon! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
-          });
-        } catch (error) {
-          console.log(error);
-          if (error.name === "DiscordAPIError[50007]") {
-            await interaction.editReply({
-              content: `This person has DMs disabled, so I couldn't DM them.`,
-            });
-          }
-        }
-      }
-      team = "Typhoon";
     }
 
     const logEmbed = new EmbedBuilder()

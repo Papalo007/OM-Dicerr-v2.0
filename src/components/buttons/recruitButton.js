@@ -51,7 +51,7 @@ module.exports = {
       return;
     }
 
-    const announcementChannel = client.channels.cache.get(
+    const announcementChannel = interaction.guild.channels.cache.get(
       config.rosterChangesChannel
     );
 
@@ -83,7 +83,7 @@ module.exports = {
         filter: collectorFilter,
         time: 30_000,
       });
-
+      
       if (confirmation.customId === "om") {
         if (
           !interaction.member.roles.cache.some(
