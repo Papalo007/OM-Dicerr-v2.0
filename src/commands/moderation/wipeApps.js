@@ -42,9 +42,10 @@ module.exports = {
 
     const myDB = mongoClient.db("test");
     const appColl = myDB.collection("applications");
+    const appRole = interaction.guild.roles.cache.get(config.applicantRole);
 
     const response = await interaction.editReply({
-      content: `Are you sure you want to wipe all applications? This action cannot be undone and it won't remove the Applicant role from anyone!`,
+      content: `Are you sure you want to wipe all applications? This action cannot be undone! (This will also remove the applicant role from anyone with an application).`,
       ephemeral: true,
       components: [firstActionRow],
       fetchReply: true,
@@ -62,7 +63,17 @@ module.exports = {
           content: `All applications have been succesfully wiped`,
           components: [],
         });
-        const result = await appColl.deleteMany().catch(console.error);
+        let result = await appColl.findOneAndDelete({
+          guildID: interaction.guild.id,
+        });
+        let member;
+        while (result !== null) {
+          member = await interaction.guild.members.fetch(result.userID);
+          await member.roles.remove(appRole);
+          result = await appColl.findOneAndDelete({
+            guildID: interaction.guild.id,
+          });
+        }
         await logChannel.send(
           `All (${result.deletedCount}) applications have been deleted by ${interaction.user.tag} (application database wiped succesfully)`
         );

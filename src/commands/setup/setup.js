@@ -147,7 +147,7 @@ If at any point you want to go to the previous question to answer it again, send
               for (roleid of staffRoles4) {
                 summary =
                   summary +
-                  `<@& this is so that no ping just delete this when done lel ${roleid}>, `;
+                  `<@&${roleid}>, `;
               }
               summary =
                 summary +
@@ -258,12 +258,12 @@ If at any point you want to go to the previous question to answer it again, send
               for (roleid of teamManagerRoles) {
                 summary =
                   summary +
-                  `<@& this is so no ping remove this hehe ping blocker ${roleid}>, `;
+                  `<@&${roleid}>, `;
               }
               summary = summary + "\nTeam Roster roles (order is the same): ";
               if (rosterRoles) {
                 for (roleid of rosterRoles) {
-                  summary = summary + `<@& ping blocker ${roleid}>, `;
+                  summary = summary + `<@&${roleid}>, `;
                 }
               } else {
                 summary = summary + "N/A";
@@ -272,7 +272,7 @@ If at any point you want to go to the previous question to answer it again, send
                 summary +
                 `\nScout Roles (roles that can review applications): `;
               for (scoutrole of scoutRoles) {
-                summary = summary + `<@& ping blocker ${scoutrole}>, `;
+                summary = summary + `<@&${scoutrole}>, `;
               }
               summary = summary + `\nRoster Chages Channel: `;
               if (rosChangesChannel) {
@@ -282,13 +282,13 @@ If at any point you want to go to the previous question to answer it again, send
               }
               summary = summary + `\nApplicant Role: `;
               if (appRole) {
-                `<@& ping blocker ${appRole}>`;
+                `<@&${appRole}>`;
               } else {
                 summary = summary + "N/A.";
               }
               summary = summary + `\nStaff Roles: `;
               for (role of staffRoles) {
-                summary = summary + `<@& ping blocker ${role}>, `;
+                summary = summary + `<@&${role}>, `;
               }
               summary =
                 summary +
