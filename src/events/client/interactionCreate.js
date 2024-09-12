@@ -13,12 +13,20 @@ module.exports = {
       const command = commands.get(commandName);
       if (!command) return;
 
+      const teamModuleCommands = [
+        "apply",
+        "recruit",
+        "sack",
+        "review",
+        "wipe-apps",
+      ];
+
       if (interaction.isRepliable()) {
         try {
+          const serverConfig = await Config.findOne({
+            guildID: interaction.guild.id,
+          });
           if (command.data.name !== "setup" && command.data.name !== "purge") {
-            const serverConfig = await Config.findOne({
-              guildID: interaction.guild.id,
-            });
             if (!serverConfig) {
               return await interaction.reply({
                 content: `You haven't set up the proper channels yet! Do /setup.`,
@@ -35,24 +43,33 @@ module.exports = {
               });
             }
           }
+          if (
+            serverConfig &&
+            !serverConfig.teamModule &&
+            teamModuleCommands.includes(command.data.name)
+          ) {
+            return await interaction.reply(
+              "This is part of the team module which you have disabled. If you want to enable it, run the /setup command again."
+            );
+          }
           await command.execute(interaction, client);
         } catch (error) {
           console.error(error);
 
           if (interaction.replied) {
             await interaction.followUp({
-              content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
+              content: `Something went wrong while executing this command.`,
               ephemeral: true,
             });
           } else {
             try {
               await interaction.deferReply({
-                content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
+                content: `Something went wrong while executing this command.`,
                 ephemeral: true,
               });
             } catch (error) {
               await interaction.editReply({
-                content: `Something went wrong while executing this command. If you see this, please open a ticket in <#1223388941718257797>`,
+                content: `Something went wrong while executing this command.`,
                 ephemeral: true,
               });
             }

@@ -55,7 +55,7 @@ module.exports = {
       } else {
         console.log(elements);
         return await interaction.editReply({
-          content: `An unknown error occurred (check terminal for more info). Please try again later.`,
+          content: `An unknown error occurred. Please try again later.`,
         });
       }
     } else if (elementExists) {
@@ -94,7 +94,7 @@ module.exports = {
       } else {
         console.log(error);
         return await interaction.editReply({
-          content: `An unknown error occurred (check terminal for more info). Please try again later.`,
+          content: `An unknown error occurred. Please try again later.`,
         });
       }
     }

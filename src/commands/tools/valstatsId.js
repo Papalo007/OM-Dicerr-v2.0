@@ -233,7 +233,7 @@ async function checkForErrors(target, page, interaction) {
     } else {
       console.log("An unknown error occurred");
       return await interaction.editReply({
-        content: `An unknown error occurred while trying to gather information about this player. Please check the bot terminal for further information.`,
+        content: `An unknown error occurred while trying to gather information about this player.`,
       });
     }
   } else {
@@ -244,7 +244,7 @@ async function checkForErrors(target, page, interaction) {
       });
     } else {
       return await interaction.editReply({
-        content: `An unknown error occurred. Please create a support ticket with a screenshot of this error message.\ntarget=${target}`,
+        content: `An unknown error occurred.`,
       });
     }
   }

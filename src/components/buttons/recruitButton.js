@@ -19,7 +19,10 @@ module.exports = {
   async execute(interaction, client) {
     await interaction.deferReply();
 
-    const tempDoc = await Temp.findOne({ tempValueOne: "app-review", guildID: interaction.guild.id });
+    const tempDoc = await Temp.findOne({
+      tempValueOne: "app-review",
+      guildID: interaction.guild.id,
+    });
     if (!tempDoc) {
       await interaction.reply({
         content: `The buttons have been disabled. Please run /review again.`,
@@ -32,8 +35,6 @@ module.exports = {
     const user = tempDoc.tempValueTwo;
     const interactionUser = tempDoc.tempValueThree;
     const appRole = interaction.guild.roles.cache.get(config.applicantRole);
-    const omRole = interaction.guild.roles.cache.get("1219879616546738236");
-    const tmRole = interaction.guild.roles.cache.get("1243214533590384660");
     const member = await interaction.guild.members.fetch(user);
     const targetUser = await client.users.fetch(user);
     let team;
@@ -55,20 +56,92 @@ module.exports = {
       config.rosterChangesChannel
     );
 
-    const omButton = new ButtonBuilder()
-      .setCustomId("om")
-      .setLabel("One More")
-      .setStyle(ButtonStyle.Primary);
+    let button1, button2, button3, button4, button5;
+    let firstActionRow = new ActionRowBuilder();
 
-    const tpnButton = new ButtonBuilder()
-      .setCustomId("tpn")
-      .setLabel("Typhoon")
-      .setStyle(ButtonStyle.Success);
-
-    const firstActionRow = new ActionRowBuilder().addComponents(
-      omButton,
-      tpnButton
-    );
+    switch (config.teams.length) {
+      case 1:
+        button1 = new ButtonBuilder()
+          .setCustomId("0")
+          .setLabel(config.teams[0])
+          .setStyle(ButtonStyle.Primary);
+        firstActionRow.addComponents(button1);
+        break;
+      case 2:
+        button1 = new ButtonBuilder()
+          .setCustomId("0")
+          .setLabel(config.teams[0])
+          .setStyle(ButtonStyle.Primary);
+        button2 = new ButtonBuilder()
+          .setCustomId("1")
+          .setLabel(config.teams[1])
+          .setStyle(ButtonStyle.Danger);
+        firstActionRow.addComponents(button1, button2);
+        break;
+      case 3:
+        button1 = new ButtonBuilder()
+          .setCustomId("0")
+          .setLabel(config.teams[0])
+          .setStyle(ButtonStyle.Primary);
+        button2 = new ButtonBuilder()
+          .setCustomId("1")
+          .setLabel(config.teams[1])
+          .setStyle(ButtonStyle.Danger);
+        button3 = new ButtonBuilder()
+          .setCustomId("2")
+          .setLabel(config.teams[2])
+          .setStyle(ButtonStyle.Success);
+        firstActionRow.addComponents(button1, button2, button3);
+        break;
+      case 4:
+        button1 = new ButtonBuilder()
+          .setCustomId("0")
+          .setLabel(config.teams[0])
+          .setStyle(ButtonStyle.Primary);
+        button2 = new ButtonBuilder()
+          .setCustomId("1")
+          .setLabel("Typhoon")
+          .setStyle(ButtonStyle.Danger);
+        button3 = new ButtonBuilder()
+          .setCustomId("2")
+          .setLabel("Typhoon")
+          .setStyle(ButtonStyle.Success);
+        button4 = new ButtonBuilder()
+          .setCustomId("3")
+          .setLabel("Typhoon")
+          .setStyle(ButtonStyle.Primary);
+        firstActionRow.addComponents(button1, button2, button3, button4);
+        break;
+      case 5:
+        button1 = new ButtonBuilder()
+          .setCustomId("0")
+          .setLabel(config.teams[0])
+          .setStyle(ButtonStyle.Primary);
+        button2 = new ButtonBuilder()
+          .setCustomId("1")
+          .setLabel(config.teams[1])
+          .setStyle(ButtonStyle.Danger);
+        button3 = new ButtonBuilder()
+          .setCustomId("2")
+          .setLabel(config.teams[2])
+          .setStyle(ButtonStyle.Success);
+        button4 = new ButtonBuilder()
+          .setCustomId("3")
+          .setLabel(config.teams[3])
+          .setStyle(ButtonStyle.Primary);
+        button5 = new ButtonBuilder()
+          .setCustomId("4")
+          .setLabel(config.teams[4])
+          .setStyle(ButtonStyle.Danger);
+        firstActionRow.addComponents(
+          button1,
+          button2,
+          button3,
+          button4,
+          button5
+        );
+        break;
+    }
 
     const response = await interaction.editReply({
       content: `Which team would you like to recruit ${targetUser.tag} (<@${user}>) into?`,
@@ -83,61 +156,31 @@ module.exports = {
         filter: collectorFilter,
         time: 30_000,
       });
-      
-      if (confirmation.customId === "om") {
-        if (
-          !interaction.member.roles.cache.some(
-            (role) => role.name === "OM Manager"
-          )
-        ) {
-          await confirmation.update({
-            content: `You are not authorised to recruit people for One More.`,
-            components: [],
+
+      team = config.teams[confirmation.customId];
+      if (
+        !interaction.member.roles.cache.some(
+          (role) => role.id === config.teamManagerRoles[confirmation.customId]
+        )
+      ) {
+        await confirmation.update({
+          content: `You are not authorised to recruit people for ${team}.`,
+          components: [],
+        });
+        return;
+      } else {
+        await member.roles.add(interaction.guild.roles.cache.get(config.teamRosterRoles[confirmation.customId])).catch(console.error);
+        await member.roles.remove(interaction.guild.roles.cache.get(config.appRole)).catch(console.error);
+
+        if (announcementChannel) {
+          await announcementChannel.send({
+            content: `<@${user}> has been accepted to ${team}!`,
           });
-          return;
-        } else {
-          await member.roles.add(omRole).catch(console.error);
-          await member.roles.remove(appRole).catch(console.error);
-
-          if (announcementChannel) {
-            await announcementChannel.send({
-              content: `<@&1245743215898919143> <@${user}> has been accepted to One More!`,
-            });
-          }
-
-          await targetUser.send({
-            content: `Congratulations, you have been accepted to One More!\nJoin our gankster team: https://valorant.gankster.gg/i?code=kLKMq1PGQWMa\nAlso make sure to DM papalo and ask for an invite to the OM server. I can't do that myself :(`,
-          });
-
-          team = "One More";
         }
-      } else if (confirmation.customId === "tpn") {
-        if (
-          !interaction.member.roles.cache.some(
-            (role) => role.name === "TPN Manager"
-          )
-        ) {
-          await confirmation.update({
-            content: `You are not authorised to recruit people for Typhoon.`,
-            components: [],
-          });
-          return;
-        } else {
-          await member.roles.add(tmRole).catch(console.error);
-          await member.roles.remove(appRole).catch(console.error);
 
-          if (announcementChannel) {
-            await announcementChannel.send({
-              content: `<@&1245743215898919143> <@${user}> has been recruited to Typhoon!`,
-            });
-          }
-
-          await targetUser.send({
-            content: `Congratulations, you have been accepted to Typhoon! Join the gankster team through this link: https://valorant.gankster.gg/i?code=yNGYPxLEJgmR\nIf you have any questions, feel free open a support ticket in https://discord.com/channels/1219872802794901565/1223388941718257797`,
-          });
-
-          team = "Typhoon";
-        }
+        await targetUser.send({
+          content: `Congratulations, you have been accepted to ${team}!`,
+        });
       }
     } catch (e) {
       console.log(e);
