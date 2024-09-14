@@ -1,3 +1,1 @@
-TODO: Make a suggestion command (for users to suggest something)
-TODO: Make the purge after command work with message link
 TODO: Make a /help command
