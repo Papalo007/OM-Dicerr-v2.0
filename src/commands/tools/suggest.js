@@ -6,7 +6,10 @@ module.exports = {
     .setDescription("Give feedback or suggest a feature for the bot")
     .setDMPermission(false)
     .addStringOption((option) =>
-      option.setName("prompt").setDescription("What would you like to suggest?")
+      option
+        .setName("prompt")
+        .setDescription("What would you like to suggest?")
+        .setRequired(true)
     ),
   /**
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
@@ -25,7 +28,7 @@ module.exports = {
     await developer.send(
       `# -------------------------\n# New Suggestion\n**By tag**: ${interaction.user.tag}, **name**: ${interaction.user.username}
       **ID:** ${interaction.user.id}\n\n**Server:** ${interaction.guild.id}, ${interaction.guild.name}, **Member Count:** ${interaction.guild.memberCount}.
-      **Suggestion:** ${suggestion}\n# -------------------------`
+      **Suggestion:** \`\`\`\n${suggestion}\n\`\`\`\n# -------------------------`
     );
 
     await interaction.reply({

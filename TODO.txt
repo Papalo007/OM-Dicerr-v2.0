@@ -1,1 +1,2 @@
-TODO: Make a /help command
+TODO: Make the /link command work with riot's api thingy
+TODO: Release the bot
