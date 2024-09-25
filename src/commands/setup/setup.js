@@ -71,6 +71,8 @@ If at any point you want to go to the previous question to answer it again, send
 
     let index = 0;
     let exited = false;
+    
+    await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
 
     exitCollector.on("collect", (message) => {
       message.reply("Exited.");
@@ -83,10 +85,10 @@ If at any point you want to go to the previous question to answer it again, send
 
     backCollector.on("collect", async (message) => {
       if (index === 0) {
-        message.reply(
+        await message.reply(
           'This is the first question. You can\'t go back. If you want to cancel setup, say "exit".'
         );
-        interaction.channel.send(`${questions[index]} ${index + 1}/10`);
+        await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
         return;
       } else if (index === 7 && answers[0].toLowerCase() === "no") {
         index = 1;
@@ -96,8 +98,6 @@ If at any point you want to go to the previous question to answer it again, send
       await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
     });
 
-    if (done === false)
-      await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
     answerCollector.on("collect", async (answer) => {
       if (checkValid(answer.content, index, interaction, answers)) {
         if (index === 0 && answer.content.toLowerCase() === "no") {
@@ -107,6 +107,7 @@ If at any point you want to go to the previous question to answer it again, send
         answers.push(answer.content);
         if (index === 10) {
           done = true;
+          answerCollector.stop();
           const confirmButton = new ButtonBuilder()
             .setCustomId("confirm")
             .setLabel("Confirm")
@@ -129,9 +130,12 @@ If at any point you want to go to the previous question to answer it again, send
           });
 
           if (answers[3].toLowerCase().includes("none")) answers[3] = null;
-          if (answers[9].toLowerCase().includes("none")) answers[8] = null;
-          if (answers[5].toLowerCase().includes("none")) answers[4] = null;
-          if (answers[6].toLowerCase().includes("none")) answers[5] = null;
+          if (answers[8] && answers[8].toLowerCase().includes("none"))
+            answers[8] = null;
+          if (answers[4] && answers[4].toLowerCase().includes("none"))
+            answers[4] = null;
+          if (answers[5] && answers[5].toLowerCase().includes("none"))
+            answers[5] = null;
 
           switch (answers.length) {
             case 4:
@@ -145,9 +149,7 @@ If at any point you want to go to the previous question to answer it again, send
 
               summary = "Team Module: Disabled\nStaff roles: ";
               for (roleid of staffRoles4) {
-                summary =
-                  summary +
-                  `<@&${roleid}>, `;
+                summary = summary + `<@&${roleid}>, `;
               }
               summary =
                 summary +
@@ -166,8 +168,6 @@ If at any point you want to go to the previous question to answer it again, send
                 components: [firstActionRow],
                 fetchReply: true,
               });
-
-              answerCollector.stop();
 
               const confirmCollectorFilter = (i) =>
                 i.user.id === interaction.user.id;
@@ -218,7 +218,7 @@ If at any point you want to go to the previous question to answer it again, send
                 return;
               }
 
-            case 9:
+            case 10:
               const rosterRoles = answers[3]
                 ? answers[3].split(",").map((str) => str.trim())
                 : answers[3];
@@ -256,9 +256,7 @@ If at any point you want to go to the previous question to answer it again, send
               }
               summary = summary + "\nTeam Manager roles (order is the same): ";
               for (roleid of teamManagerRoles) {
-                summary =
-                  summary +
-                  `<@&${roleid}>, `;
+                summary = summary + `<@&${roleid}>, `;
               }
               summary = summary + "\nTeam Roster roles (order is the same): ";
               if (rosterRoles) {
@@ -309,8 +307,6 @@ If at any point you want to go to the previous question to answer it again, send
                 components: [firstActionRow],
                 fetchReply: true,
               });
-
-              answerCollector.stop();
 
               const confirmCollectorFilter1 = (i) =>
                 i.user.id === interaction.user.id;
@@ -373,9 +369,13 @@ If at any point you want to go to the previous question to answer it again, send
                 });
                 return;
               }
+            default:
+              console.log(`An error occurred with the setup command. Answers array has a length of: ${answers.length}. Array contents are:\n${answers}`);
+              await interaction.channel.send(`An error occurred. Please use the /suggest command to report this.`)
           }
         }
-        interaction.channel.send(`${questions[index]} ${index + 1}/10`);
+        if (!done)
+          await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
       } else {
         answer.reply("That is not a valid answer.\n");
         interaction.channel.send(`${questions[index]} ${index + 1}/10`);
@@ -455,6 +455,8 @@ function checkValid(answer, index, interaction, answers) {
         answer.toLowerCase().includes("none") ||
         interaction.guild.channels.cache.get(answer)
       ) {
+        if (answer.toLowerCase().includes("none")) return true;
+
         if (
           interaction.guild.channels.cache.get(answer).type === 0 ||
           interaction.guild.channels.cache.get(answer).type === 5
