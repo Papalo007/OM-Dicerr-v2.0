@@ -13,11 +13,11 @@
     "@discordjs/rest": "^2.2.0",
     "chalk": "^4.1.2",
     "discord-api-types": "^0.37.83",
-    "discord.js": "^14.14.1",
+    "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
     "mongoose": "^8.4.4",
     "nodemon": "^3.1.4",
-    "playwright": "^1.46.0",
+    "playwright": "^1.47.2",
     "playwright-extra": "^4.3.6",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
