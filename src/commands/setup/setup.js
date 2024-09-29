@@ -71,7 +71,7 @@ If at any point you want to go to the previous question to answer it again, send
 
     let index = 0;
     let exited = false;
-    
+
     await interaction.channel.send(`${questions[index]} ${index + 1}/10`);
 
     exitCollector.on("collect", (message) => {
@@ -130,12 +130,12 @@ If at any point you want to go to the previous question to answer it again, send
           });
 
           if (answers[3].toLowerCase().includes("none")) answers[3] = null;
-          if (answers[8] && answers[8].toLowerCase().includes("none"))
-            answers[8] = null;
           if (answers[4] && answers[4].toLowerCase().includes("none"))
             answers[4] = null;
           if (answers[5] && answers[5].toLowerCase().includes("none"))
             answers[5] = null;
+          if (answers[9] && answers[9].toLowerCase().includes("none"))
+            answers[9] = null;
 
           switch (answers.length) {
             case 4:
@@ -272,7 +272,7 @@ If at any point you want to go to the previous question to answer it again, send
               for (scoutrole of scoutRoles) {
                 summary = summary + `<@&${scoutrole}>, `;
               }
-              summary = summary + `\nRoster Chages Channel: `;
+              summary = summary + `\nRoster Updates Channel: `;
               if (rosChangesChannel) {
                 summary = summary + `<#${rosChangesChannel}>`;
               } else {
@@ -370,8 +370,12 @@ If at any point you want to go to the previous question to answer it again, send
                 return;
               }
             default:
-              console.log(`An error occurred with the setup command. Answers array has a length of: ${answers.length}. Array contents are:\n${answers}`);
-              await interaction.channel.send(`An error occurred. Please use the /suggest command to report this.`)
+              console.log(
+                `An error occurred with the setup command. Answers array has a length of: ${answers.length}. Array contents are:\n${answers}`
+              );
+              await interaction.channel.send(
+                `An error occurred. Please use the /suggest command to report this.`
+              );
           }
         }
         if (!done)
