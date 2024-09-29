@@ -1,4 +1,3 @@
 TODO: Make the /link command work with riot's api thingy
 TODO: Host the bot on Contabo
 TODO: If contabo fails, https://www.hetzner.com/cloud/
-test here ayy
