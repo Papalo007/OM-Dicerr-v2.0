@@ -226,7 +226,7 @@ If at any point you want to go to the previous question to answer it again, send
                 ? answers[9].split(",").map((str) => str.trim())
                 : answers[9];
               const staffRoles = answers[7].split(",").map((str) => str.trim());
-              const logChan = answers[6];
+              const logChan = answers[8];
 
               const teamsAndShortCodes = answers[1]
                 .split(",")
@@ -280,7 +280,7 @@ If at any point you want to go to the previous question to answer it again, send
               }
               summary = summary + `\nApplicant Role: `;
               if (appRole) {
-                `<@&${appRole}>`;
+                summary = summary + `<@&${appRole}>`;
               } else {
                 summary = summary + "N/A.";
               }

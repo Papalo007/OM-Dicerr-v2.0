@@ -45,7 +45,7 @@ module.exports = {
           }
           if (
             serverConfig &&
-            !serverConfig.teamModule &&
+            serverConfig.teamModule === "false" &&
             teamModuleCommands.includes(command.data.name)
           ) {
             return await interaction.reply(
