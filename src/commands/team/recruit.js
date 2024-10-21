@@ -48,8 +48,8 @@ module.exports = {
 
     for (let i = 0; i < config.teams.length; i++) {
       if (
-        team.toLowerCase() === config.teams[i] ||
-        team.toLowerCase() === config.teamShortCodes[i]
+        team.toLowerCase() === config.teams[i].toLowerCase() ||
+        team.toLowerCase() === config.teamShortCodes[i].toLowerCase()
       ) {
         done = true;
         team = config.teams[i];
