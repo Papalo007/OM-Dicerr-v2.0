@@ -2,3 +2,6 @@
 /TODO.txt
 /screenshotLol.png
 /node_modules
+/package-lock.json
+/package.json
+/src/functions/handlers/handleCommands.js
