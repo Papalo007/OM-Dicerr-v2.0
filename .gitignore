@@ -5,3 +5,6 @@
 /package-lock.json
 /package.json
 /src/functions/handlers/handleCommands.js
+package-lock.json
+package.json
+src/functions/handlers/handleCommands.js
