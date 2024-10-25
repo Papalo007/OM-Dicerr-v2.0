@@ -77,7 +77,7 @@ module.exports = {
     const moderatorNotes = app.moderatorNotes || "None.";
     const missedMatches = app.missedMatches || 0;
     let embed;
-    const warnDB = mongoClient.db("test");
+    const warnDB = mongoClient.db("bot");
     const warnColl = warnDB.collection("warnings");
     const query = { guildID: interaction.guild.id, userID: user.id };
 
@@ -256,7 +256,7 @@ module.exports = {
     await temp.save().catch(console.error);
 
     setTimeout(() => {
-      const myDB = mongoClient.db("test");
+      const myDB = mongoClient.db("bot");
       const myColl = myDB.collection("temp");
       const query = { tempValueOne: "app-review", guildID: interaction.guild.id };
       myColl.deleteOne(query);

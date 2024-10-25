@@ -55,7 +55,7 @@ module.exports = {
 
     const mongoClient = new MongoClient(databaseToken);
 
-    const myDB = mongoClient.db("test");
+    const myDB = mongoClient.db("bot");
     const warnColl = myDB.collection("warnings");
     const query = {
       reason: dateReason.substring(10),

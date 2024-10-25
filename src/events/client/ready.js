@@ -6,7 +6,7 @@ module.exports = {
   once: true,
   async execute(client) {
     const mongoClient = new MongoClient(databaseToken);
-    const myDB = mongoClient.db("test");
+    const myDB = mongoClient.db("bot");
     await myDB.collection("temp").deleteMany({});
     console.log('Cleared database collection "temp"');
 

@@ -180,7 +180,7 @@ If at any point you want to go to the previous question to answer it again, send
               if (confirmationCollector.customId === "confirm") {
                 if (existingConfig) {
                   const mongoClient = new MongoClient(databaseToken);
-                  const myDB = mongoClient.db("test");
+                  const myDB = mongoClient.db("bot");
                   const coll = myDB.collection("configs");
                   const filter = { guildID: interaction.guild.id };
                   const updateConfig = {
@@ -319,7 +319,7 @@ If at any point you want to go to the previous question to answer it again, send
               if (confirmationCollector2.customId === "confirm") {
                 if (existingConfig) {
                   const mongoClient = new MongoClient(databaseToken);
-                  const myDB = mongoClient.db("test");
+                  const myDB = mongoClient.db("bot");
                   const coll = myDB.collection("configs");
                   const filter = { guildID: interaction.guild.id };
                   const updateConfig = {

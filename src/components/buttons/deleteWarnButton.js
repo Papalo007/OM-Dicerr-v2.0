@@ -40,7 +40,7 @@ module.exports = {
     await interaction.deferReply({ ephemeral: true });
 
     const mongoClient = new MongoClient(databaseToken);
-    const testDB = mongoClient.db("test");
+    const testDB = mongoClient.db("bot");
     const warnColl = testDB.collection("warnings");
     const query = { guildID: interaction.guild.id, userID: user };
     const options = {

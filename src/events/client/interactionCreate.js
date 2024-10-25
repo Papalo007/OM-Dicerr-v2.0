@@ -35,7 +35,10 @@ module.exports = {
             }
             if (
               serverConfig.botCommandsChannel &&
-              !serverConfig.botCommandsChannel.includes(interaction.channelId)
+              !serverConfig.botCommandsChannel.includes(
+                interaction.channelId
+              ) &&
+              command.data.name !== "apply"
             ) {
               return await interaction.reply({
                 content: `You cannot use commands in this channel!`,
@@ -122,7 +125,9 @@ module.exports = {
       } catch (error) {
         console.error(error);
       }
-    } else if (interaction.type === InteractionType.ApplicationCommandAutocomplete) {
+    } else if (
+      interaction.type === InteractionType.ApplicationCommandAutocomplete
+    ) {
       const { commands } = client;
       const { commandName } = interaction;
       const command = commands.get(commandName);

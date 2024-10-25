@@ -23,7 +23,7 @@ module.exports = {
 
     await interaction.editReply({
       content: `Team Module: ${config.teamModule}
-        Teams: ${config.teams.toString()},
+  Teams: ${config.teams.toString()},
   teamShortCodes: ${config.teamShortCodes.toString()},
   teamManagerRoles: ${config.teamManagerRoles.toString()},
   teamRosterRoles: ${config.teamRosterRoles.toString()},

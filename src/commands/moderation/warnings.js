@@ -43,7 +43,7 @@ module.exports = {
 
     const user = interaction.options.getUser("target");
     const mongoClient = new MongoClient(databaseToken);
-    const testDB = mongoClient.db("test");
+    const testDB = mongoClient.db("bot");
     const warnColl = testDB.collection("warnings");
     const query = { guildID: interaction.guild.id, userID: user.id };
     const options = {
@@ -107,7 +107,7 @@ module.exports = {
       await temp.save().catch(console.error);
 
       setTimeout(() => {
-        const testDB = mongoClient.db("test");
+        const testDB = mongoClient.db("bot");
         const tempColl = testDB.collection("temp");
         const query = { tempValueOne: "delete-warning", guildID: interaction.guild.id };
         tempColl.deleteOne(query);

@@ -35,7 +35,7 @@ module.exports = {
     const appRole = interaction.guild.roles.cache.get(config.applicantRole);
     const mongoClient = new MongoClient(databaseToken);
 
-    const myDB = mongoClient.db("test");
+    const myDB = mongoClient.db("bot");
     const appColl = myDB.collection("applications");
     const query = { userID: userId };
 

@@ -104,7 +104,7 @@ module.exports = {
     //Saving to the DB
     const existingLink = await Link.findOne({ userID: interaction.user.id });
     if (existingLink) {
-      const myDB = mongoClient.db("test");
+      const myDB = mongoClient.db("bot");
       const coll = myDB.collection("riotdiscordlink");
       const filter = { userID: interaction.user.id };
 
