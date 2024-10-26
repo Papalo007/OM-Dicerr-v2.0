@@ -28,7 +28,7 @@ module.exports = {
   async execute(interaction, client) {
     const config = await Config.findOne({ guildID: interaction.guildId });
     for (roleid of config.staffRoles) {
-      if (interaction.member.roles.some((role) => role.id === roleid)) {
+      if (interaction.member.roles.cache.some((role) => role.id === roleid)) {
         return;
       }
 

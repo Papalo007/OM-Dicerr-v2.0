@@ -1,5 +1,6 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10");
+const { botId } = process.env;
 
 const fs = require("fs");
 
@@ -22,7 +23,7 @@ module.exports = (client) => {
       }
     }
 
-    const clientId = "1237042556047724634"; //bot discord id
+    const clientId = botId;
     const guildId = ""; //server id here if u want the bot to only work in that server
     const rest = new REST({ version: "10" }).setToken(process.env.token);
     try {

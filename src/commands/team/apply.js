@@ -31,17 +31,13 @@ module.exports = {
     }
 
     for (roleid of config.teamRosterRoles) {
-      if (interaction.member.roles.some((role) => role.id === roleid)) {
-        return;
+      if (interaction.member.roles.cache.some((role) => role.id === roleid)) {
+        return await interaction.reply({
+          content: `You are already in a team!`,
+          ephemeral: true,
+        });
       }
-      await interaction.reply({
-        content: `You are already in a team!`,
-        ephemeral: true,
-      });
-      done = true;
     }
-
-    if (done) return;
 
     //Building the modal action rows
     const linkin = await Link.findOne({ userID: interaction.user.id });
