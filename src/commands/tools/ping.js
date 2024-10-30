@@ -7,6 +7,7 @@ module.exports = {
     .setDMPermission(false),
   /**
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
+   * @param {import('discord.js').Client} client
    */
   async execute(interaction, client) {
     const message = await interaction.deferReply({
@@ -19,5 +20,7 @@ module.exports = {
     await interaction.editReply({
       content: newMessage,
     });
+
+    await client.application.entitlements.createTest();
   },
 };
