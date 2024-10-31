@@ -20,7 +20,5 @@ module.exports = {
     await interaction.editReply({
       content: newMessage,
     });
-
-    await client.application.entitlements.createTest("1299439029976039424");
   },
 };
