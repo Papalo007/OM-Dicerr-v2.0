@@ -21,8 +21,6 @@ module.exports = {
       content: newMessage,
     });
 
-    //await client.application.entitlements.createTest();
-    const allll = await client.application.fetchSKUs();
-    console.log(allll);
+    await client.application.entitlements.createTest("1299439029976039424");
   },
 };
