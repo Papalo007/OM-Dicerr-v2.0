@@ -23,6 +23,6 @@ module.exports = {
 
     //await client.application.entitlements.createTest();
     const allll = await client.application.fetchSKUs();
-    console.log(alll);
+    console.log(allll);
   },
 };
