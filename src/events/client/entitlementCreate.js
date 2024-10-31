@@ -1,36 +1,16 @@
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const { token } = process.env;
-
 module.exports = {
   name: "entitlementCreate",
   async execute(entitlement, client) {
+    console.log(
+      "entitlementCreate event received and thingy executed eehehehhehehee"
+    );
     const dev = await client.users.fetch("706547981184270428");
     const user = await client.users.fetch(entitlement.userId);
-    try {
-      const response = await fetch(
-        `https://discord.com/api/v10/store/skus/${entitlement.skuId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bot ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const sku = client.application.entitlements.cache.find(
+      ({ skuId }) => skuId === entitlement.skuId
+    );
 
-      if (!response.ok)
-        console.error(`Failed to fetch SKU details: ${response.statusText}`);
-
-      const skuData = await response.json();
-
-      console.log("SKU Details:", skuData);
-      console.log("SKU Name:", skuData.name);
-
-    } catch (error) {
-      console.error("Error fetching SKU details:", error);
-    }
-
-    const message = `# ----------------------\n# Purchase complete!\nSKU Name: ${skuData.name}, SKU ID: ${entitlement.skuId}
+    const message = `# ----------------------\n# Purchase complete!\nSKU Name: ${sku.name}, SKU ID: ${entitlement.skuId}
 Starts at: ${entitlement.startsAt}, Ends at: ${entitlement.endsAt}\nConsumed: ${entitlement.consumed}, Entitlement ID: ${entitlement.id}
 User's tag: ${user.tag}, ID: ${entitlement.userId}`;
 
@@ -40,7 +20,7 @@ User's tag: ${user.tag}, ID: ${entitlement.userId}`;
       message += "\nUser Subscription";
     }
 
-    await dev.send(message);
+    await dev.send(message).catch(console.error);
 
     //TODO: Add a switch statement to send the user who bought this thing a message + their privileges.
   },
