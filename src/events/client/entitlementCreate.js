@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const { token } = process.env;
 
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
       );
 
       if (!response.ok)
-        throw new Error(`Failed to fetch SKU details: ${response.statusText}`);
+        console.error(`Failed to fetch SKU details: ${response.statusText}`);
 
       const skuData = await response.json();
 
