@@ -21,6 +21,8 @@ module.exports = {
       content: newMessage,
     });
 
-    await client.application.entitlements.createTest();
+
+    const theGuild = client.guilds.cache.get("1298719487784386610");
+    await client.application.entitlements.createTest(theGuild);
   },
 };
