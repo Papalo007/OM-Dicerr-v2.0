@@ -21,8 +21,8 @@ module.exports = {
       content: newMessage,
     });
 
-
-    const theGuild = "1299439029976039424";
-    await client.application.entitlements.createTest(theGuild);
+    //await client.application.entitlements.createTest();
+    const allll = await client.application.fetchSKUs();
+    console.log(alll);
   },
 };
