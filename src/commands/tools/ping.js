@@ -22,7 +22,7 @@ module.exports = {
     });
 
 
-    const theGuild = client.guilds.cache.get("1298719487784386610");
+    const theGuild = "1299439029976039424";
     await client.application.entitlements.createTest(theGuild);
   },
 };
