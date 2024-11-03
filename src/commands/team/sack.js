@@ -4,7 +4,7 @@ const Config = require("../../schemas/config");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("sack")
-    .setDescription("Kick the provided player from OM or TPN")
+    .setDescription("Kick the provided player from a team")
     .setDMPermission(false)
     .addUserOption((option) =>
       option
