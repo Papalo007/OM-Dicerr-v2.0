@@ -78,7 +78,7 @@ module.exports = {
 
       if (announcementChannel) {
         await announcementChannel.send({
-          content: `<@${userId}> has been removed from One More's roster.`,
+          content: `<@${userId}> has been removed from ${team}'s roster.`,
         });
       }
 
