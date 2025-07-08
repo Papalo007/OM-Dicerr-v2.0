@@ -6,8 +6,7 @@ const {
 module.exports = {
   data: new ContextMenuCommandBuilder()
     .setName("getAvatar")
-    .setType(ApplicationCommandType.User)
-    .setDMPermission(false),
+    .setType(ApplicationCommandType.User),
   /**
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */

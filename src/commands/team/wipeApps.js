@@ -13,7 +13,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("wipe-apps")
     .setDescription("Deletes all applications.")
-    .setDMPermission(false)
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   /**
    * @param {import('discord.js').ChatInputCommandInteraction} interaction

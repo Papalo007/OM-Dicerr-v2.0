@@ -11,7 +11,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("link")
     .setDescription("Link your discord with your Valorant Account.")
-    .setDMPermission(false)
     .addStringOption((option) =>
       option
         .setName("riotid")

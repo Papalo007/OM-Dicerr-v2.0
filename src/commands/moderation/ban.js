@@ -9,8 +9,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("ban")
     .setDescription("Bans the member provided.")
-    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
-    .setDMPermission(false)
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers) 
     .addUserOption((option) =>
       option
         .setName("target")

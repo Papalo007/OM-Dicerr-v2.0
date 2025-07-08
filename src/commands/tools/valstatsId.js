@@ -7,7 +7,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("valstats-id")
     .setDescription("Returns the statistics of the provided user in Valorant.")
-    .setDMPermission(false)
+    
     .addStringOption((option) =>
       option
         .setName("target")

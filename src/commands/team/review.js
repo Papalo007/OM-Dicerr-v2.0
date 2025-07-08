@@ -17,7 +17,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("review")
     .setDescription("Review the application of a player")
-    .setDMPermission(false)
     .addUserOption((option) =>
       option
         .setName("target")

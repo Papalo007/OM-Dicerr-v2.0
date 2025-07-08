@@ -7,7 +7,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("recruit")
     .setDescription("Recruit the provided player into the team!")
-    .setDMPermission(false)
     .addUserOption((option) =>
       option
         .setName("target")

@@ -4,7 +4,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("suggest")
     .setDescription("Give feedback or suggest a feature for the bot")
-    .setDMPermission(false)
     .addStringOption((option) =>
       option
         .setName("prompt")

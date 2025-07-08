@@ -14,8 +14,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("setup")
     .setDescription("Setup the bot!")
-    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .setDMPermission(false),
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   /**
    * @param {import('discord.js').ChatInputCommandInteraction} interaction

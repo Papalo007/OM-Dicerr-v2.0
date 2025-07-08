@@ -11,8 +11,7 @@ const Config = require("../../schemas/config");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("apply")
-    .setDescription("Apply for the premier team.")
-    .setDMPermission(false),
+    .setDescription("Apply for the premier team."),
   /**
    * @param {import('discord.js').ChatInputCommandInteraction} interaction
    */

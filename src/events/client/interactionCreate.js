@@ -1,5 +1,6 @@
 const { InteractionType } = require("discord.js");
 const Config = require("../../schemas/config");
+const logEvent = require("../../functions/utils/logger.js");
 
 module.exports = {
   name: "interactionCreate",
@@ -58,6 +59,7 @@ module.exports = {
           await command.execute(interaction, client);
         } catch (error) {
           console.error(error);
+          await logEvent(client, `Command Error: ${error.stack || error.message || error}`, true);
 
           if (interaction.replied) {
             await interaction.followUp({

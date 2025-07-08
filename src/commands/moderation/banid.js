@@ -9,7 +9,6 @@ module.exports = {
     .setName("banid")
     .setDescription("Bans the user with the ID provided.")
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
-    .setDMPermission(false)
     .addStringOption((option) =>
       option
         .setName("target")

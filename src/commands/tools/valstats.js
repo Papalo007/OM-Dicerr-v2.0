@@ -9,8 +9,7 @@ module.exports = {
     .setName("valstats")
     .setDescription(
       "Returns the statistics of the provided Discord user in Valorant."
-    )
-    .setDMPermission(false)
+    )  
     .addUserOption((option) =>
       option
         .setName("user")
@@ -258,6 +257,8 @@ async function checkForErrors(target, page, interaction) {
         content: `${target}'s profile is private, so I cannot access any information regarding this player :(`,
       });
     } else {
+      let elements = await page.locator("h1").textContent();
+      console.log(elements);
       return await interaction.editReply({
         content: `An unknown error occurred.`,
       });

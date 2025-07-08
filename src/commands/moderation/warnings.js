@@ -15,7 +15,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("warnings")
     .setDescription("Returns the warnings this member has received.")
-    .setDMPermission(false)
     .addUserOption((option) =>
       option
         .setName("target")

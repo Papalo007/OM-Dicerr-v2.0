@@ -3,6 +3,7 @@ const { token, databaseToken } = process.env;
 const { connect } = require("mongoose");
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
 const fs = require("fs");
+const logEvent = require("./functions/utils/logger.js");
 
 const client = new Client({
   intents: [
@@ -28,6 +29,21 @@ for (const folder of functionFolders) {
   for (const file of functionFiles)
     require(`./functions/${folder}/${file}`)(client);
 }
+
+process.on("unhandledRejection", async (reason, promise) => {
+  await logEvent(
+    client,
+    `Unhandled Rejection (crash): ${reason}\nPromise:  ${promise}`,
+    true
+  );
+  process.exit(1);
+});
+
+// Handle uncaught exceptions
+process.on("uncaughtException", async (error) => {
+  await logEvent(client, `Uncaught Exception (crash): ${error}`, true);
+  process.exit(1);
+});
 
 client.handleEvents();
 client.handleCommands();

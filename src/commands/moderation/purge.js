@@ -4,7 +4,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("purge")
     .setDescription("Delete multiple messages")
-    .setDMPermission(false)
     .addSubcommand((subcommand) =>
       subcommand
         .setName("after")

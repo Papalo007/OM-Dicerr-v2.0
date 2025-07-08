@@ -5,7 +5,6 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("sack")
     .setDescription("Kick the provided player from a team")
-    .setDMPermission(false)
     .addUserOption((option) =>
       option
         .setName("target")

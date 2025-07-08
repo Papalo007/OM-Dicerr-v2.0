@@ -10,7 +10,6 @@ module.exports = {
     .setName("kick")
     .setDescription("Kicks the member provided.")
     .setDefaultMemberPermissions(PermissionFlagsBits.KickMembers)
-    .setDMPermission(false)
     .addUserOption((option) =>
       option
         .setName("target")

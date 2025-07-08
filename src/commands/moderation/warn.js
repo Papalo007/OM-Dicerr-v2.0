@@ -6,8 +6,7 @@ const Config = require("../../schemas/config");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("warn")
-    .setDescription("Warn a member.")
-    .setDMPermission(false)
+    .setDescription("Warn a member.") 
     .addUserOption((option) =>
       option
         .setName("target")
